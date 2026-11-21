@@ -30,17 +30,45 @@ def build_site(source: Path, destination: Path) -> dict:
         shutil.rmtree(destination)
     shutil.copytree(source, destination)
 
+    # Generate privacy-safe, indexed synthetic talent data from the same
+    # pinned, previously verified ESCO snapshot used by the live workbench.
+    esco_file = destination / "data" / "esco.json"
+    if esco_file.is_file():
+        import sys
+        sys.path.insert(0, str(ROOT))
+        from scripts.build_talent import generate, write_sqlite
+        graph = json.loads(esco_file.read_text(encoding="utf-8"))
+        catalog = generate(graph)
+        (destination / "data" / "talent-sandbox.json").write_text(
+            json.dumps(catalog, ensure_ascii=False, separators=(",", ":")), encoding="utf-8"
+        )
+        write_sqlite(catalog, destination / "data" / "talent-sandbox.sqlite")
+        print("Built ESCO-derived fictional talent sandbox:", catalog["counts"])
+
     manifest = {}
-    for asset in ("engine.js", "xlsx.js"):
+    for asset in ("engine.js", "xlsx.js", "talent.js"):
         original = destination / asset
         content = original.read_bytes()
         revised = f"{original.stem}.{checksum(content)}{original.suffix}"
         original.rename(destination / revised)
         manifest[asset] = revised
 
+    # Fingerprint talent-ui after rewriting the two dependencies it imports.
+    ui_path = destination / "talent-ui.js"
+    talent_ui = ui_path.read_text(encoding="utf-8")
+    for dep in ("talent.js", "engine.js"):
+        old = f"from './{dep}'"
+        if old not in talent_ui:
+            raise ValueError(f"Expected talent-ui ESM import missing: {old}")
+        talent_ui = talent_ui.replace(old, f"from './{manifest[dep]}'")
+    ui_name = f"talent-ui.{checksum(talent_ui.encode('utf-8'))}.js"
+    (destination / ui_name).write_text(talent_ui, encoding="utf-8")
+    ui_path.unlink()
+    manifest["talent-ui.js"] = ui_name
+
     original = destination / "app.js"
     content = original.read_text(encoding="utf-8")
-    for base in ("engine.js", "xlsx.js"):
+    for base in ("engine.js", "xlsx.js", "talent-ui.js"):
         old = f"from './{base}'"
         if old not in content:
             raise ValueError(f"Expected ESM import missing: {old}")

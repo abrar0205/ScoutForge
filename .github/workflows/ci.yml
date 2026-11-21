@@ -27,6 +27,24 @@ jobs:
           node --check web/app.js
           node --check web/engine.js
           node --check web/xlsx.js
+          node --check web/talent.js
+          node --check web/talent-ui.js
+      - name: Inspect ESCO-derived fictional profile SQLite/JSON release
+        run: |
+          python - <<'PY'
+          import json,sqlite3
+          from pathlib import Path
+          if Path('_site/data/esco.json').exists():
+            path=Path('_site/data/talent-sandbox.json')
+            d=json.loads(path.read_text())
+            assert d['kind']=='synthetic_talent_sandbox'
+            assert d['counts']['profiles']>1000
+            assert all(p['source']=='synthetic_esco' for p in d['profiles'])
+            con=sqlite3.connect('_site/data/talent-sandbox.sqlite')
+            assert con.execute('select count(*) from profiles').fetchone()[0]==d['counts']['profiles']
+            con.close()
+            print('Verified fictional talent snapshot:',d['counts'])
+          PY
       - name: Validate published source data when available
         run: |
           if [ -f web/data/esco.json ]; then python -c "import json;d=json.load(open('web/data/esco.json'));assert d['counts']['occupations']>50"; fi
@@ -46,4 +64,4 @@ jobs:
       - name: Build fingerprinted website
         run: python scripts/build_site.py
       - name: Run desktop/mobile workflow regression against packaged site
-        run: SCOUTFORGE_SITE_ROOT=_site SCOUTFORGE_REAL_MODULES=1 python tests/browser_smoke.py
+        run: SCOUTFORGE_SITE_ROOT=_site SCOUTFORGE_REAL_MODULES=1 SCOUTFORGE_REAL_TALENT=1 python tests/browser_smoke.py

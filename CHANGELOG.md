@@ -1,3 +1,11 @@
+## v0.4 — Talent Sandbox and completed sourcing demo
+- Reproducible source-attributed ESCO-based synthetic profile dataset with downloadable SQLite database and static JSON index.
+- Browser-based search, filters, fictional profiles, inspectable skill chips, lightweight family landscape chart and optional what-if profile for unknown skills.
+- Save fictional profiles into browser-local outreach simulation, edit statuses, draft unsent outreach, and export queue CSV + five-sheet Excel.
+- Optional privacy-limited, local-only CSV import for authorized anonymous role/skill records.
+- Responsive recruiter UI and browser/unit/data checks, hashed module imports and atomic GitHub Pages publication.
+- Clear provenance labeling: no real candidates, live supply claims, unauthorized scraping, ranking, or actual contact.
+
 # ScoutForge release notes
 
 ## v0.3.1 — Prevent stale CSS and JS across deployments

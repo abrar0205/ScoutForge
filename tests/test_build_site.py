@@ -13,7 +13,7 @@ class BuildSiteTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / 'release'
             m = build_site(ROOT / 'web', out)
-            self.assertEqual(set(m), {'styles.css', 'app.js', 'engine.js', 'xlsx.js'})
+            self.assertEqual(set(m), {'styles.css', 'app.js', 'engine.js', 'xlsx.js', 'talent.js', 'talent-ui.js'})
             html = (out / 'index.html').read_text()
             app = (out / m['app.js']).read_text()
             css = (out / m['styles.css']).read_text()
@@ -29,6 +29,25 @@ class BuildSiteTests(unittest.TestCase):
             self.assertNotIn('href="styles.css"', html)
             self.assertFalse((out / 'styles.css').exists())
             self.assertFalse((out / 'app.js').exists())
+
+    def test_esco_source_generates_sqlite_and_json_snapshots(self):
+        import json, sqlite3, shutil
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / 'source'
+            shutil.copytree(ROOT / 'web', source)
+            catalog = {
+                'source': 'European Commission ESCO', 'version': '1.2.0',
+                'skills': [{'id': 's1', 'name': 'Python'}, {'id': 's2', 'name': 'PLC'}],
+                'occupations': [{'id': 'o1', 'name': 'automation engineer', 'skills': [{'id': 's1'}, {'id': 's2'}]}],
+            }
+            (source / 'data' / 'esco.json').write_text(json.dumps(catalog))
+            out = Path(tmp) / 'release'
+            build_site(source, out)
+            data = json.loads((out / 'data' / 'talent-sandbox.json').read_text())
+            self.assertEqual(data['counts']['profiles'], 3)
+            self.assertEqual(data['kind'], 'synthetic_talent_sandbox')
+            with sqlite3.connect(out / 'data' / 'talent-sandbox.sqlite') as con:
+                self.assertEqual(con.execute('SELECT count(*) FROM profiles').fetchone()[0], 3)
 
     def test_css_change_changes_release_filename(self):
         with tempfile.TemporaryDirectory() as tmp:
