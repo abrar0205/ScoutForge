@@ -40,6 +40,17 @@ jobs:
           PYI
       - name: Prepare versioned HTML/CSS/JavaScript release
         run: python scripts/build_site.py
+      - name: Verify fictional SQLite/JSON talent sandbox
+        run: |
+          python - <<'PY'
+          import json,sqlite3
+          d=json.load(open('_site/data/talent-sandbox.json'))
+          assert d['kind']=='synthetic_talent_sandbox'
+          assert d['counts']['profiles']>1000
+          with sqlite3.connect('_site/data/talent-sandbox.sqlite') as db:
+            assert db.execute('select count(*) from profiles').fetchone()[0]==d['counts']['profiles']
+          print('Verified fictional data:',d['counts'])
+          PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

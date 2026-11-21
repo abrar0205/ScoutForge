@@ -70,3 +70,31 @@ The GitHub Actions browser job uses real HTTP-served ES modules plus a **clearly
 - `.github/workflows/` — PR validation, ESCO source publishing, GitHub Pages deployment
 
 **Project code:** MIT license. The ESCO-derived taxonomy is subject to its source-specific reuse conditions. Third-party names and trademarks remain their owners' property.
+
+
+## v0.4 — Talent Sandbox + Campaign Operations
+
+ScoutForge now includes an **end-to-end fictional recruitment workflow**. Recruiters can enter any role/skill, explore a searchable profile corpus, inspect examples, save them to a demo outreach queue, edit unsent outreach drafts, move demo records through simulation stages, and export records as a CSV or five-sheet Excel workbook. Role analysis and ESCO skills remain fully functional.
+
+### Data provenance, privacy and what this is not
+
+- **ESCO**: the European Commission's real, source-attributed occupation/skill classification (v1.2.0 subset). [Original ESCO downloads](https://esco.ec.europa.eu/en/use-esco/download).
+- **Talent Sandbox**: a deterministic, reproducible library of **fictional profiles** generated from the checked-in ESCO relationships plus clearly editorial skill vocabularies. These are not real people, actual CVs, available talent, or evidence that any person has listed qualifications. The source contains no names, faces, email addresses, phone numbers or actual recruitment records.
+- The build publishes `data/talent-sandbox.json` for the browser and a real, indexed **SQLite database** `data/talent-sandbox.sqlite` (tables: `profiles`, `profile_skills`). No paid hosting or backend API is required. If the dataset cannot load, a clearly labeled small fictional starter library remains usable.
+- Unknown terms never produce fake positive search results. The interface shows that no *stored demo* profile covers the term and offers an explicitly labeled **what-if** example the user can create on demand. This is not live candidate sourcing or suitability scoring.
+- Optional **local CSV import**: `id,title,skills,region`, where skills are separated with `|`. Only use non-identifying, authorized role/skill data. Personal columns (name/email/phone/etc.) are rejected; imported records remain in that browser tab and are not uploaded or retained in storage.
+- The outreach queue is a **simulation**; it does not send messages, access LinkedIn/ATS, record actual responses, determine applicant suitability, or collect candidate personal information. Queue state for synthetic profiles is saved locally in the user's browser; use Reset to clear.
+
+### Reproducible builds and tests
+
+```bash
+npm test                             # skill parsing, search, safety and workbook tests
+python -m unittest discover -s tests -p 'test_*.py' -v
+python scripts/build_talent.py --esco web/data/esco.json \
+  --out web/data/talent-sandbox.json --sqlite web/data/talent-sandbox.sqlite
+python scripts/build_site.py        # create clean, fingerprinted production release
+```
+
+`build_site.py` automatically derives the SQLite/JSON snapshots when the checked-in ESCO catalog is present. `GitHub Pages` publishes **the same fingerprinted bundle** validated by GitHub Actions, including browser tests at desktop and mobile widths.
+
+A real, live candidate index would require a contracted provider, authorized ATS/Recruiter integration or an employer-owned database with appropriate permissions and safeguards; free public CV datasets do not establish candidate availability or permission to contact anyone. This project intentionally demonstrates sourcing *process* quality without pretending that fictional talent represents actual prospects.

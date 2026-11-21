@@ -1,5 +1,5 @@
 /* Tiny dependency-free XLSX writer. ZIP STORE + OOXML inline text cells.
-   No network access or candidate data. All values are serialized as strings,
+   No network access; only fictional sandbox IDs are exported. All values are serialized as strings,
    so untrusted input never becomes an Excel formula. */
 const utf=new TextEncoder();
 const xml=s=>String(s??'').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
@@ -28,13 +28,14 @@ function zip(entries){const local=[],central=[];let offset=0;
  const end=Uint8Array.from([...u32(0x06054b50),...u16(0),...u16(0),...u16(entries.length),...u16(entries.length),...u32(centralBytes),...u32(offset),...u16(0)]);
  const items=[...local,...central,end],output=new Uint8Array(items.reduce((n,x)=>n+x.length,0));let start=0;for(const item of items){output.set(item,start);start+=item.length;}return output;
 }
-export function buildWorkbook({title,terms=[],strategies=[],notes='',source}={}){
+export function buildWorkbook({title,terms=[],strategies=[],notes='',source,queue=[],profiles=[]}={}){
  const now=new Date().toISOString().slice(0,10);
  const sheets=[
-  {name:'Plan overview',widths:[25,88],rows:[['Field','Detail'],['Role',title||'Skill-led search'],['Prepared',now],['Review status','Draft — recruiter review required'],['Approved search terms',terms.map(t=>t.name).join(', ')],['Source','ESCO '+(source?.version||'not loaded')+' + exact terms from job description'],['Notes',notes],['Data limitation','No candidate database, live candidate availability or outreach results are included'],['Usage','Copy the Boolean strings into your authorized sourcing platform and validate there']]},
+  {name:'Plan overview',widths:[25,88],rows:[['Field','Detail'],['Role',title||'Skill-led search'],['Prepared',now],['Review status','Draft — recruiter review required'],['Approved search terms',terms.map(t=>t.name).join(', ')],['Source','ESCO '+(source?.version||'not loaded')+' + exact terms from job description'],['Notes',notes],['Data limitation','Searchable fictional profile library exists for demonstration. No real contactable candidates, verified availability or actual outreach results.'],['Usage','Copy the Boolean strings into your authorized sourcing platform and validate there']]},
   {name:'Search strategies',widths:[18,100,68,24],rows:[['Approach','Boolean query','Guidance','Status'],...strategies.map(s=>[s.name,s.query,s.approach,'Draft / validate'])]},
   {name:'Reviewed terms',widths:[35,22,90],rows:[['Search term','Evidence origin','Evidence in JD'],...terms.map(t=>[t.name,t.provenance==='esco'?'ESCO concept':t.provenance==='manual'?'Recruiter added':'Exact term in JD',t.evidence||'Recruiter entered'])]},
-  {name:'Activity tracker',widths:[19,22,25,42,18,19,19,70],rows:[['Date','Role','Channel','Search variant','Profiles reviewed','Messages sent','Responses','Learning / next action'],...Array.from({length:18},()=>['','','','','','','',''])]}
+  {name:'Activity tracker',widths:[19,22,25,42,18,19,19,70],rows:[['Date','Role','Channel','Search variant','Profiles reviewed','Messages sent','Responses','Learning / next action'],...Array.from({length:18},()=>['','','','','','','',''])]},
+  {name:'Fictional demo queue',widths:[22,52,28,30,35],rows:[['Fictional profile ID','Sample occupation','Illustrative region','Demo stage','Source / limitation'],...queue.map(row=>{const p=profiles.find(p=>p.id===row.id);return [row.id,p?.title||row.title||'',p?.location||'',row.stage||'Research','SIMULATED ONLY; no person contacted'];})]}
  ];
  const fileTypes=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`;
  const rels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;

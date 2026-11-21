@@ -151,7 +151,7 @@ export function dossier({title,jd,requirements=[],roles=[],strategies=[],selecte
    '', '## Boolean searches',...strategies.flatMap(s=>[`### ${s.name}`,s.query||'(Not available)',validateBoolean(s.query).message,'']),
    '## Related ESCO occupations (vocabulary exploration only)',...roles.map(r=>`- ${r.name}: ${r.overlap} shared ESCO concepts`),...(!roles.length?['- No linked occupations identified from selected ESCO concepts.']:[]),
    '', '## Unsent outreach template',outreach||'Not prepared','', '## Recruiter notes',notes||'None','',
-   '## Important limitations','- Search terms are suggestions, not verified candidate qualifications.','- No candidate records, real search results or availability data have been checked.','- Boolean grammar differs across platforms; verify syntax and relevance before use.','- Review outreach before sending; no messages are automatically sent.',
+   '## Important limitations','- Search terms are suggestions, not verified candidate qualifications.','- The separate talent sandbox contains fictional sample profiles only; no real candidate availability or contact information is provided.','- Boolean grammar differs across platforms; verify syntax and relevance before use.','- Review outreach before sending; no messages are automatically sent.',
    `- ESCO taxonomy reference: ${source?.version||'not loaded'} · ${ESCO_SOURCE}`,'','## Supplied job description',jd||'(Not supplied)'].join('\n');
 }
 export function download(name,text,type='text/plain'){const u=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500);}

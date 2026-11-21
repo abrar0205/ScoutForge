@@ -1,5 +1,6 @@
 import {extractRequirements,extractTitle,occupationsForSkills,createStrategies,validateBoolean,cleanUserTerms,dossier,download,short,ESCO_SOURCE,taxonomyTest,outreachDraft,GLOSSARY} from './engine.js';
 import {downloadWorkbook} from './xlsx.js';
+import {initTalent} from './talent-ui.js';
 const $=id=>document.getElementById(id);
 const state={catalog:null,analyzed:false,title:'',jd:'',requirements:[],selected:new Set(),roles:[],strategies:[],overrides:{},activeStrategy:'balanced',showAll:false};
 const SAMPLE=`Industrial Automation Engineer
@@ -46,6 +47,7 @@ function generate({quiet=false}={}){
  $('outreach-draft').value=outreachDraft({title,terms:activeTerms().map(r=>r.name)});
  $('reviewer-notes').value='';$('related-details').open=false;$('outreach-details').open=false;$('evidence-details').open=false;
  rebuild();renderTerms();
+ window.dispatchEvent(new CustomEvent('scoutforge:role-ready',{detail:{title,terms:activeTerms().map(t=>t.name)}}));
  if(!quiet)toast(keywordCount?`Plan ready · ${keywordCount} search ${keywordCount===1?'term':'terms'} found`:'Plan ready · add a skill to make your search more specific');
  $('results').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
 }
@@ -128,7 +130,7 @@ async function copyText(text,target,message){
  try{await navigator.clipboard.writeText(text);toast(message);}catch{target.focus();target.select();toast('Clipboard unavailable; text selected for manual copying.');}
 }
 function exportBrief(){if(state.stale){toast('Regenerate the strategy after editing the role.');return;}download('ScoutForge-sourcing-brief.md',dossier({title:state.title,jd:state.jd,requirements:state.requirements,roles:state.roles,strategies:state.strategies,selected:[...state.selected],notes:$('reviewer-notes').value,source:state.catalog,outreach:$('outreach-draft').value}),'text/markdown;charset=utf-8');toast('Sourcing brief downloaded.');}
-function exportExcel(){if(state.stale){toast('Regenerate the strategy after editing the role.');return;}downloadWorkbook({title:state.title==='Untitled role'?'Skill-led search':state.title,terms:activeTerms(),strategies:state.strategies,source:state.catalog,notes:$('reviewer-notes').value});toast('Excel workbook downloaded.');}
+function exportExcel(){if(state.stale){toast('Regenerate the strategy after editing the role.');return;}downloadWorkbook({title:state.title==='Untitled role'?'Skill-led search':state.title,terms:activeTerms(),strategies:state.strategies,source:state.catalog,notes:$('reviewer-notes').value,queue:window.scoutforgeTalent?.getQueue()||[],profiles:window.scoutforgeTalent?.getProfiles()||[]});toast('Excel workbook downloaded.');}
 function clear(){state.analyzed=false;state.stale=false;state.title='';state.jd='';state.requirements=[];state.selected.clear();state.roles=[];state.strategies=[];state.overrides={};
  ['job-description','role-title','skill-input','outreach-draft','reviewer-notes','atlas-search'].forEach(id=>$(id).value='');$('results').hidden=true;countWords();$('job-description').focus();toast('Workspace cleared.');}
 function init(){
@@ -151,5 +153,6 @@ function init(){
  $('copy-outreach').addEventListener('click',()=>copyText($('outreach-draft').value,$('outreach-draft'),'Unsent outreach draft copied. Personalize before sending.'));
  $('export-md').addEventListener('click',exportBrief);$('export-xlsx').addEventListener('click',exportExcel);
  countWords();loadCatalog();
+ window.scoutforgeTalent=initTalent({getRoleContext:()=>({title:state.title,terms:activeTerms().map(r=>r.name)}),toast});
 }
 init();

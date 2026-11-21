@@ -8,7 +8,9 @@ from functools import partial
 from playwright.sync_api import sync_playwright
 from zipfile import ZipFile
 from xml.etree import ElementTree as ET
-import json, os, re
+import json, os, re, sys
+sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
+from scripts.build_talent import generate
 ROOT=Path(os.environ['SCOUTFORGE_SITE_ROOT']).resolve() if os.environ.get('SCOUTFORGE_SITE_ROOT') else Path(__file__).resolve().parent.parent/'web'
 FIXTURE={'source':'European Commission ESCO','version':'TEST FIXTURE','retrieved_at':'2026-01-01T00:00:00Z','counts':{'occupations':3,'skills':3,'relations':4},'skills':[{'id':'s1','name':'quality control','alt':''},{'id':'s2','name':'maintain electrical equipment','alt':''},{'id':'s3','name':'program industrial robots','alt':''}],'occupations':[{'id':'o1','name':'industrial automation technician','isco':'3113','skills':[{'id':'s2','type':'essential'},{'id':'s3','type':'optional'}]},{'id':'o2','name':'industrial engineer','isco':'2141','skills':[{'id':'s1','type':'essential'}]},{'id':'o3','name':'industrial robotics engineer','isco':'2142','skills':[{'id':'s3','type':'essential'}]}]}
 class QuietHandler(SimpleHTTPRequestHandler):
@@ -27,6 +29,9 @@ try:
     failures=[];page.on('pageerror',lambda error:failures.append(str(error)))
     if os.environ.get('SCOUTFORGE_REAL_MODULES'):
      page.route('**/data/esco.json',lambda route:route.fulfill(status=200,content_type='application/json',body=json.dumps(FIXTURE)))
+     if not os.environ.get('SCOUTFORGE_REAL_TALENT'):
+      sandbox=generate(FIXTURE)
+      page.route('**/data/talent-sandbox.json',lambda route:route.fulfill(status=200,content_type='application/json',body=json.dumps(sandbox)))
      page.goto(f'http://127.0.0.1:{server.server_port}/',wait_until='networkidle',timeout=30000)
     else:
      html=(ROOT/'index.html').read_text(encoding='utf8');css=(ROOT/'styles.css').read_text(encoding='utf8')
@@ -37,7 +42,9 @@ try:
      html=html.replace('<script type="module" src="app.js"></script>','<script>window.fetch=async()=>({ok:true,json:async()=>('+json.dumps(FIXTURE)+')});</script><script type="module">'+engine+'\n'+xlsx+'\n'+app+'</script>')
      html=re.sub(r'<link[^>]*fonts.googleapis[^>]*>', '',html)
      html=re.sub(r'<link[^>]*fonts.gstatic[^>]*>', '',html)
+     sandbox=generate(FIXTURE)
      page.set_content(html,wait_until='domcontentloaded',timeout=20000)
+     page.route('**/data/talent-sandbox.json',lambda route:route.fulfill(status=200,content_type='application/json',body=json.dumps(sandbox)))
     page.wait_for_function("document.querySelector('#data-status').textContent.includes('ready')",timeout=25000)
     # Releases must load their own CSS and JS rather than older browser-cached copies.
     if os.environ.get('SCOUTFORGE_SITE_ROOT'):
@@ -47,6 +54,34 @@ try:
      assets=page.evaluate("() => [...document.querySelectorAll('link[rel=stylesheet], script[type=module]')].map(e=>e.getAttribute('href')||e.getAttribute('src'))")
      assert any(re.match(r'^styles\.[0-9a-f]{12}\.css$',a) for a in assets),assets
      assert any(re.match(r'^app\.[0-9a-f]{12}\.js$',a) for a in assets),assets
+    page.wait_for_function("document.querySelector('#talent-data-status').textContent.includes('ready')",timeout=25000)
+    assert page.locator('#talent-profile-list').locator('.talent-profile').count()>=1
+    # Search the actual synthetic database, inspect a fictional profile,
+    # draft an unsent outreach and record a simulated stage.
+    page.locator('#talent-search').fill('Python')
+    assert page.locator('.talent-profile').count()>=1
+    page.locator('.talent-profile [data-view]').first.click()
+    assert page.locator('#talent-dialog').is_visible()
+    assert 'Fictional' in page.locator('#talent-dialog-summary').inner_text()
+    assert 'never sent' in page.locator('.talent-draft-area').inner_text()
+    page.locator('#talent-dialog-add').click()
+    assert not page.locator('#talent-dialog').is_visible()
+    page.locator('#talent-tab-queue').click()
+    assert page.locator('#talent-queue-list .talent-queue-line').count()>=1
+    page.locator('#talent-queue-list select').first.select_option('Draft ready')
+    assert '1' in page.locator('#talent-funnel').inner_text()
+    with page.expect_download(timeout=12000) as qdownload:page.locator('#talent-export-csv').click()
+    assert qdownload.value.suggested_filename.endswith('.csv')
+    page.locator('#talent-tab-explore').click()
+    page.locator('#talent-search').fill('xenotech-hypothetical-99')
+    assert page.locator('#talent-whatif').is_visible()
+    page.locator('#talent-whatif-create').click()
+    assert page.locator('.talent-profile').count()>=1
+    assert 'WHAT-IF' in page.locator('.talent-profile').first.inner_text()
+    # Session-only CSV import includes no names, email, phone or other PII.
+    page.locator('#talent-import-csv').set_input_files({'name':'safe-import.csv','mimeType':'text/csv','buffer':b'id,title,skills,region\nIMPORT-1,Technical coordinator,Hydraulics|Excel,Leipzig\n'})
+    page.locator('#talent-search').fill('Hydraulics')
+    assert 'Technical coordinator' in page.locator('#talent-profile-list').inner_text()
     # Exact screenshot repro: title supplied, description only 'python' - must NOT be empty.
     page.locator('#job-description').fill('python')
     page.locator('.optional-input summary').click()
@@ -91,7 +126,7 @@ try:
     book_path=Path(download.value.path())
     with ZipFile(book_path) as z:
      assert z.testzip() is None
-     assert len([x for x in z.namelist() if x.startswith('xl/worksheets/')])==4
+     assert len([x for x in z.namelist() if x.startswith('xl/worksheets/')])==5
      ET.fromstring(z.read('xl/workbook.xml'))
      assert b'Hydraulics' in z.read('xl/worksheets/sheet3.xml')
     page.locator('#outreach-details summary').click()
@@ -100,7 +135,7 @@ try:
     assert page.evaluate('document.documentElement.scrollWidth')<=width+1,f'Horizontal overflow at {width}'
     if os.environ.get('SCOUTFORGE_SCREENSHOTS'):
      page.screenshot(path=f'/mnt/data/scoutforge-{width}-v03.png',full_page=True)
-    print(f'PASS ScoutForge v0.3 @{width}: screenshot repro, editable search, skill library, ESCO links, Excel export')
+    print(f'PASS ScoutForge v0.4 @{width}: synthetic talent search, fictional profile, demo queue, what-if, local import, editable Boolean, five-sheet Excel')
     page.close()
   finally:browser.close()
 finally:server.shutdown();server.server_close()

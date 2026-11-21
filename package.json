@@ -1,11 +1,11 @@
 {
   "name": "scoutforge",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
-  "description": "Evidence-linked recruiter sourcing workbench with native Excel exports",
+  "description": "Evidence-backed sourcing + synthetic talent sandbox with browser-local campaign operations",
   "scripts": {
     "test": "node --test tests/*.test.js",
-    "check": "node --check web/engine.js && node --check web/app.js && node --check web/xlsx.js"
+    "check": "node --check web/engine.js && node --check web/app.js && node --check web/xlsx.js && node --check web/talent.js && node --check web/talent-ui.js"
   }
 }
