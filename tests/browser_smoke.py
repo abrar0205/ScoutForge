@@ -55,6 +55,13 @@ def run(page, base, width):
     # The intake folds away so the results lead; the role title is visible below the sticky bar.
     expect(page.locator("#intro")).to_be_hidden()
     expect(page.locator("#role-title")).to_be_in_viewport()
+    if width == 390:
+        # Responsive regression: the search panel cannot be squeezed into a narrow column.
+        panel_width = page.locator(".work").evaluate("(el) => el.getBoundingClientRect().width")
+        assert panel_width >= 320, f"Search panel too narrow: {panel_width}px"
+        assert page.locator('.out[data-platform="recruiter"]').evaluate(
+            "(el) => el.getBoundingClientRect().width"
+        ) >= 290
     assert page.locator('.out[data-platform="recruiter"]').evaluate(
         "(el) => getComputedStyle(el).borderTopStyle"
     ) == "solid"
