@@ -35,8 +35,14 @@
   <div class="wrap">
     <div id="intro" class="intro">
       <div class="intro-copy">
+        <p class="intro-kicker"><span class="kicker-line" aria-hidden="true"></span>SOURCING INTELLIGENCE <span aria-hidden="true">/</span> PRIVATE WORKBENCH</p>
         <h1>Turn a job description into searches you can run.</h1>
-        <p class="lede">ScoutForge keeps only the skills it can point to in the text and writes Boolean searches for LinkedIn Recruiter, Google and XING, in English, German and Polish. Nothing leaves your browser.</p>
+        <p class="lede">Find the right search terms, check their evidence and build searches for LinkedIn Recruiter, Google and XING. Your role stays in your browser.</p>
+        <ol class="hero-steps" aria-label="How to use ScoutForge">
+          <li><span>01</span> Paste a role</li>
+          <li><span>02</span> Review skills</li>
+          <li><span>03</span> Copy or export</li>
+        </ol>
         <figure class="specimen">
           <p class="spec-src">“Maintain <mark>Siemens S7</mark> <mark>PLCs</mark> using <mark>TIA Portal</mark>.”</p>
           <p class="spec-to" aria-hidden="true">becomes</p>
@@ -48,7 +54,7 @@
       <form id="intake" class="card intake" autocomplete="off">
         <div class="field-head">
           <label for="jd" class="label">Job description <span class="hint">or a few skills</span></label>
-          <span id="jd-count" class="hint">0 words</span>
+          <span id="jd-count" class="hint word-count">0 words</span>
         </div>
         <textarea id="jd" rows="10" maxlength="30000" placeholder="Paste the full job description here, or type skills such as: PLC, TIA Portal, KUKA"></textarea>
         <label for="title" class="label">Job title <span class="hint">optional, helps with title variants</span></label>
