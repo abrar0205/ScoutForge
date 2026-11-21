@@ -1,100 +1,83 @@
-# ScoutForge — Sourcing Workbench
-
-**Independent open-source project. Not affiliated with Tesla, LinkedIn, or the European Commission.**
+# ScoutForge — sourcing copilot for manufacturing hiring
 
 **Live:** https://abrar0205.github.io/ScoutForge/
 
-ScoutForge turns a job description — or even a single skill — into an **editable Boolean sourcing strategy**, with inspectable search terms, optional ESCO vocabulary exploration, a recruiter-reviewed outreach draft, and an Excel workbook export.
+ScoutForge turns a job description into everything a sourcer needs for the first week of a search, in about a minute:
 
-## v0.3.1 — Reliable, cache-safe website releases
+- **Search pack**: LinkedIn Recruiter *Job title* and *Keywords* strings, a Google X-ray string and a generic string for XING, job boards and ATS search. Narrow, balanced and broad strategies; English, German and Polish profile vocabulary; every string parsed and validated.
+- **Talent map** for Berlin-Brandenburg: commute tiers including cross-border Poland, adjacent employers, schools and channels, with company-targeted X-ray strings and a ready-to-paste LinkedIn *Companies* filter.
+- **Outreach** drafts in English and German (formal *Sie*) with a live candidate-experience check: length, personalisation, one clear ask, an easy way to say no, no hype.
+- **AI assist**: a role-specific prompt library with guardrails, plus an optional bring-your-own-key step (Anthropic or any OpenAI-compatible endpoint) that suggests titles and synonyms for human approval.
+- **Excel workbook**: search pack, a pipeline tracker with dropdowns, a funnel and channel-performance dashboard built on live formulas, an automation-impact calculator and the prompt library.
+- **Batch mode** for several open roles at once, and an **ATS data check** that finds duplicates, non-standard stages and sources, broken emails, mixed date formats and stale records.
 
-GitHub Pages publishes the output of `python scripts/build_site.py` (directory `_site/`), not raw `web/` files. The build fingerprints the CSS, app and imported JavaScript filenames, rewrites every reference to the same release, and writes an asset manifest. This prevents a new interface loading outdated browser-cached styles or ESM modules. The CSS and ESM paths are checked in CI and the generated site is exercised in the desktop/mobile browser tests. No browser settings or private keys are required.
+Everything runs in the browser. Nothing is uploaded, fonts are self-hosted, and there are no third-party requests.
 
-## v0.3 — One input, one search, one export
+> Independent open-source project. Not affiliated with Tesla, LinkedIn, XING, Google or the European Commission.
 
-The v0.3 release is a product usability overhaul driven by real browser feedback. A sample failure (`Industrial Automation Engineer` and a JD containing only `python`) no longer produces an unhelpful blank analysis.
+## Why v1.0 exists: measured, not assumed
 
-- **Paste or type a skill.** The tool recognizes exact text-based skill mentions from a transparent, versioned glossary (Python, SQL, PLC, TIA Portal, Power Automate, etc.) as well as recorded ESCO skills. Short inputs can be used as reviewable keywords. A human must approve search terms.
-- **Copy an editable search immediately.** Balanced, Focused, and Broad query structures have syntax validation. Users can add, remove, and search for suggested skill terms without navigating between pages.
-- **Export a native Excel workbook.** A dependency-free OOXML exporter creates four sheets: Plan overview, Search strategies, Reviewed terms, and an **empty**, editable activity tracker. No fabricated outreach or hiring results. A separate Markdown brief is available.
-- **Optional detail.** Evidence sentences, ESCO-related occupations and the outreach template are behind expandable sections. There is no mandatory three-step wizard or large empty second panel.
-- **Client-side by default.** The job description and strategy remain in the browser; the public demo does not store candidate records, send messages or scrape recruitment sites.
+v0.4 matched single generic words against the ESCO taxonomy. For the built-in "Industrial Automation Engineer" sample it searched for *bridge engineering*, *fisheries management* and *manufacturing of made-up textile articles*, and left PLC, Siemens S7 and TIA Portal out of the string.
 
-### Data provenance — three separate classes of terms
+v1.0 replaces that with an evidence-based engine and measures the result on 12 hand-labelled job descriptions ([`eval/roles.json`](eval/roles.json)):
 
-| Class | How derived | What it means |
-|---|---|---|
-| `ESCO concept` | Literal or narrowly normalized match to a published ESCO skill label/alias | Verified taxonomy concept, with evidence from supplied text |
-| `Exact JD keyword` | Literal match to a name/alias in `web/engine.js`'s editorial glossary | Present in the text, **not claimed to be an ESCO concept** |
-| `Recruiter added` | Explicitly entered by the user | A human-provided search term, not independently verified |
+| Metric (mean over 12 roles) | v0.4 | v1.0 |
+|---|---:|---:|
+| Precision of the terms pre-selected for the search | 35% | **98%** |
+| Must-have skills covered by default | 26% | **91%** |
+| Irrelevant terms among all suggestions (lower is better) | 57% | **13%** |
 
-The skill glossary is hand-maintained vocabulary for **exact term recognition**. It is **not generative AI, semantic embeddings, recruiter benchmarking, or automated talent matching**. Unrecognized short inputs are offered back as editable keywords, never as factual ESCO relationships.
+Reproduce with `node eval/run.mjs`. The job descriptions were written for the benchmark to resemble typical regional manufacturing roles; they are not real postings, and the benchmark measures term extraction, not search results or hiring outcomes. The remaining v1.0 miss ("Paint shop" pre-selected for a data-analyst role) is left visible on purpose. CI fails if precision drops below 90% or must-have recall below 85%.
 
-### Source taxonomy
+## How it decides
 
-The repository publishes a reproducible ESCO **v1.2.0** snapshot via `scripts/build_esco.py` and `.github/workflows/esco.yml`. Current snapshot: **420 occupations, 5,001 skills and 18,936 relations**. The data comes from a pinned public mirror of official European Commission ESCO CSV records and includes source metadata.
+1. **Evidence.** The text is split into sentences and sections (*Requirements*, *Nice to have*, *Ihr Profil*…). A skill counts only if a phrase from the curated vocabulary appears word-for-word. Short acronyms such as SAP or ATS, and words that are also ordinary English (Excel, React, Rust, Workday), must appear as product names.
+2. **Priority.** "Is a plus", "preferred" or "von Vorteil" mark nice-to-haves. Specific tools rank above broad domains. Working conditions such as shift work are kept as context, and language requirements become LinkedIn filters rather than keywords.
+3. **Vocabulary.** 89 skills and 19 job families in [`web/js/vocab.js`](web/js/vocab.js), with the terms people actually write on profiles in English, German (both gendered forms, because LinkedIn has no wildcards) and Polish.
+4. **Strings.** Synonyms are grouped by category: OR inside a group, AND between groups. X-ray strings stay inside Google's ~32-word budget and report what was trimmed.
+5. **Human in the loop.** ESCO multi-word concepts and AI suggestions are offered, never added automatically.
 
-Official classification: https://esco.ec.europa.eu/en/use-esco/download
+## Project layout
 
-ESCO occupations shown in the optional explorer are connected through **recorded skill IDs**, not invented similarity measurements. The test-corpus count evaluates ontology **occupation records**, not actual people, candidate supply, search-platform results or hiring outcomes. Boolean syntax and quality must be checked on the chosen external sourcing platform.
+```
+web/index.html, web/styles.css        single-page interface (no framework, no build step needed locally)
+web/js/analyze.js                     sentence/section parsing, evidence, priority, job family
+web/js/vocab.js                       editorial EN/DE/PL vocabulary (versioned)
+web/js/boolean.js                     platform-specific builders + Boolean parser/validator
+web/js/market.js                      Berlin-Brandenburg talent-map seed list (editorial)
+web/js/outreach.js, prompts.js, ai.js outreach drafts + checks, prompt library, BYO-key AI adapter
+web/js/xlsx.js, workbook.js           dependency-free XLSX writer with formulas and data validation
+web/js/ats.js, csv.js                 ATS export data-quality checks, safe CSV I/O
+web/data/esco-index.json              compact ESCO v1.2.0 skill index (multi-word phrases only)
+eval/                                 benchmark set, runner, v0.4 engine kept for comparison
+scripts/build_site.py                 fingerprinted, cache-safe release for GitHub Pages
+scripts/build_esco.py, build_esco_index.py   reproducible ESCO snapshot and index
+tests/                                node:test suites, Python build tests, Playwright end-to-end test
+```
 
-### Privacy and limitations
-
-- Use public job descriptions only; never paste identifiable candidate data, private CVs or confidential business data into the public demo.
-- Recruiters must review and edit terms, outreach language, and search syntax before use.
-- No LinkedIn scraping, automatic messages, candidate ranking or recruitment decisions.
-- No hosted generative-AI inference is connected in this release. Any future hosted LLM requires a secure backend, explicit limits, testing and provenance.
-- Outreach templates include verification placeholders rather than invented employer or candidate facts.
-- Generated XLSX values use **inline string cells** and cannot execute user-provided spreadsheet formulas.
-
-## Test locally
+## Run and test locally
 
 ```sh
-python -m http.server 8080 --directory web
-# visit http://localhost:8080
-npm test
-npm run check
-python -m unittest discover -s tests -p 'test_*.py' -v
-python tests/browser_smoke.py
+python3 -m http.server 8080 --directory web      # open http://localhost:8080
+npm test                                         # 23 unit tests incl. the benchmark guard
+node eval/run.mjs                                # benchmark table
+python3 -m unittest discover -s tests -p 'test_*.py'
+python3 scripts/build_site.py && SCOUTFORGE_SITE_ROOT=_site python3 tests/browser_smoke.py
 ```
 
-The GitHub Actions browser job uses real HTTP-served ES modules plus a **clearly labeled, CI-only taxonomy fixture** to test: the Python screenshot regression, a longer manufacturing JD, query changes, optional source links, new terms, `.md` download and structurally valid `.xlsx` download at **1440px and 390px**. The historical ESCO snapshot is unchanged.
+The browser test runs every flow at 1440 px and 390 px: analysis, toggles, validation errors, talent map, outreach scoring, all downloads (the workbook is unzipped and its formulas checked), batch, ATS check and the benchmark page. It also asserts there are no console errors, no external requests and no horizontal scrolling.
 
-## Architecture
+## Privacy and limitations
 
-- `web/index.html`, `web/styles.css`, `web/app.js` — accessible, progressive single-page workflow
-- `web/engine.js` — text evidence, glossary, Boolean parser, three strategies, optional ESCO corpus test
-- `web/xlsx.js` — native OOXML+ZIP workbook generator, no dependencies
-- `scripts/build_esco.py` — verifiable published ESCO subset builder
-- `tests/` — JavaScript unit tests, browser tests, Python data-pipeline tests
-- `.github/workflows/` — PR validation, ESCO source publishing, GitHub Pages deployment
+- Use public job descriptions. The ATS check runs locally; still, only load exports you are allowed to process, and prefer pseudonymised data.
+- The optional AI step sends the role summary (title, skills, current string) only to the endpoint you configure, with your key, which is held in memory for the tab. Do not paste personal data.
+- The vocabulary is hand-curated; unknown tools are not guessed, so add them as terms.
+- The talent map is an editorial starting list (reviewed 2026-11) with no headcounts or availability claims.
+- Platforms change their search syntax. Test strings on the target platform and read the first results before scaling up.
+- XLSX text is always written as inline strings, so user text can never become a formula; CSV exports escape values beginning with `=`, `+`, `-` or `@`.
 
-**Project code:** MIT license. The ESCO-derived taxonomy is subject to its source-specific reuse conditions. Third-party names and trademarks remain their owners' property.
+## Data sources and licences
 
-
-## v0.4 — Talent Sandbox + Campaign Operations
-
-ScoutForge now includes an **end-to-end fictional recruitment workflow**. Recruiters can enter any role/skill, explore a searchable profile corpus, inspect examples, save them to a demo outreach queue, edit unsent outreach drafts, move demo records through simulation stages, and export records as a CSV or five-sheet Excel workbook. Role analysis and ESCO skills remain fully functional.
-
-### Data provenance, privacy and what this is not
-
-- **ESCO**: the European Commission's real, source-attributed occupation/skill classification (v1.2.0 subset). [Original ESCO downloads](https://esco.ec.europa.eu/en/use-esco/download).
-- **Talent Sandbox**: a deterministic, reproducible library of **fictional profiles** generated from the checked-in ESCO relationships plus clearly editorial skill vocabularies. These are not real people, actual CVs, available talent, or evidence that any person has listed qualifications. The source contains no names, faces, email addresses, phone numbers or actual recruitment records.
-- The build publishes `data/talent-sandbox.json` for the browser and a real, indexed **SQLite database** `data/talent-sandbox.sqlite` (tables: `profiles`, `profile_skills`). No paid hosting or backend API is required. If the dataset cannot load, a clearly labeled small fictional starter library remains usable.
-- Unknown terms never produce fake positive search results. The interface shows that no *stored demo* profile covers the term and offers an explicitly labeled **what-if** example the user can create on demand. This is not live candidate sourcing or suitability scoring.
-- Optional **local CSV import**: `id,title,skills,region`, where skills are separated with `|`. Only use non-identifying, authorized role/skill data. Personal columns (name/email/phone/etc.) are rejected; imported records remain in that browser tab and are not uploaded or retained in storage.
-- The outreach queue is a **simulation**; it does not send messages, access LinkedIn/ATS, record actual responses, determine applicant suitability, or collect candidate personal information. Queue state for synthetic profiles is saved locally in the user's browser; use Reset to clear.
-
-### Reproducible builds and tests
-
-```bash
-npm test                             # skill parsing, search, safety and workbook tests
-python -m unittest discover -s tests -p 'test_*.py' -v
-python scripts/build_talent.py --esco web/data/esco.json \
-  --out web/data/talent-sandbox.json --sqlite web/data/talent-sandbox.sqlite
-python scripts/build_site.py        # create clean, fingerprinted production release
-```
-
-`build_site.py` automatically derives the SQLite/JSON snapshots when the checked-in ESCO catalog is present. `GitHub Pages` publishes **the same fingerprinted bundle** validated by GitHub Actions, including browser tests at desktop and mobile widths.
-
-A real, live candidate index would require a contracted provider, authorized ATS/Recruiter integration or an employer-owned database with appropriate permissions and safeguards; free public CV datasets do not establish candidate availability or permission to contact anyone. This project intentionally demonstrates sourcing *process* quality without pretending that fictional talent represents actual prospects.
+- ESCO v1.2.0, © European Union, used under the ESCO reuse conditions for optional multi-word skill matches. https://esco.ec.europa.eu/en/use-esco/download
+- Inter and JetBrains Mono fonts under the SIL Open Font License ([`web/assets/fonts/OFL.txt`](web/assets/fonts/OFL.txt)).
+- Code: MIT licence. Third-party names and trademarks belong to their owners.
