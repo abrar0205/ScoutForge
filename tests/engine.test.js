@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateBoolean,createStrategies,extractTitle,extractRequirements,occupationsForSkills,safePhrase,dossier,cleanUserTerms} from '../web/engine.js';
+const esco={source:'European Commission ESCO',version:'1.2.0',skills:[{id:'s:1',name:'program industrial robots',alt:''},{id:'s:2',name:'maintain equipment',alt:''}],occupations:[{id:'o:1',name:'automation technician',skills:[{id:'s:1',type:'essential'},{id:'s:2',type:'optional'}]}]};
+test('title uses first meaningful line',()=>assert.equal(extractTitle('Automation Engineer\nBuild equipment'),'Automation Engineer'));
+test('JD skill evidence is exact and source linked',()=>{const x=extractRequirements('Role\nMust program industrial robots for the team.\nPreferred: maintain equipment.',esco);assert.equal(x.length,2);assert.equal(x.find(e=>e.id==='s:2').type,'preferred');assert.match(x[0].source,/esco/)});
+test('occupation expansion only occurs on recorded graph links',()=>{let x=occupationsForSkills(esco,['s:1']);assert.equal(x.length,1);assert.equal(x[0].matched[0].id,'s:1');assert.deepEqual(occupationsForSkills(esco,['unknown']),[])});
+test('Boolean strategy compiles balanced groups',()=>{let x=createStrategies({title:'Automation Engineer',roles:[{name:'automation technician'}],terms:['PLC','Siemens S7','maintenance']});assert.ok(x.every(s=>validateBoolean(s.query).valid));assert.ok(x[1].query.includes('OR'))});
+test('Boolean validator rejects malformed grammar',()=>{for(const s of ['(PLC AND)','(PLC','PLC OR OR AI','"PLC" "AI"','PLC)'])assert.equal(validateBoolean(s).valid,false,s)});
+test('Boolean escaping and manual terms are bounded',()=>{assert.equal(safePhrase('test"it'), '"test it"');assert.deepEqual(cleanUserTerms('PLC;PLC, HMI\nSCADA'),['PLC','HMI','SCADA'])});
+test('dossier never asserts candidate supply',()=>{const s=dossier({title:'Automation Engineer',jd:'JD',requirements:[],roles:[],strategies:[],source:esco});assert.match(s,/not evidence of candidate suitability/)});

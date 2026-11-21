@@ -1,0 +1,44 @@
+name: Build verified ESCO snapshot
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build_esco.py'
+      - '.github/workflows/esco.yml'
+permissions:
+  contents: write
+jobs:
+  update-esco:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download pinned ESCO CSV snapshot and extract real graph
+        run: python scripts/build_esco.py --out web/data/esco.json
+      - name: Verify graph integrity and provenance
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('web/data/esco.json'))
+          assert d['source']=='European Commission ESCO'
+          assert d['counts']['occupations'] >= 50
+          assert d['counts']['relations'] >= d['counts']['occupations']
+          ids={s['id'] for s in d['skills']}
+          assert all(l['id'] in ids for o in d['occupations'] for l in o['skills'])
+          print(d['counts'])
+          PY
+      - name: Commit derived ESCO snapshot (no raw data or personal information)
+        run: |
+          if ! git diff --quiet -- web/data/esco.json || ! git ls-files --error-unmatch web/data/esco.json >/dev/null 2>&1; then
+            git config user.name 'scoutforge-data-bot'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add web/data/esco.json
+            git commit -m 'data: publish verified ESCO v1.2.0 occupation-skill subset'
+            git push
+          fi
