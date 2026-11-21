@@ -1,116 +1,131 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#0a1015" />
-  <meta name="description" content="ScoutForge is an independent, evidence-led sourcing intelligence workbench. Analyze job requirements, explore ESCO skill relationships and compare Boolean search strategies." />
-  <meta property="og:title" content="ScoutForge — Sourcing intelligence with a paper trail." />
-  <meta property="og:description" content="An independent strategy lab for more deliberate, testable talent sourcing." />
-  <title>ScoutForge / The Intelligence Behind Every Search</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#0a1216"/>
+  <meta name="description" content="ScoutForge turns a job description into a transparent sourcing strategy. Real ESCO skills, editable Boolean searches, and a recruiter-ready export."/>
+  <meta property="og:title" content="ScoutForge — Search with evidence"/>
+  <meta property="og:description" content="A compact, practical sourcing-strategy workbench backed by real European occupation data."/>
+  <title>ScoutForge — Sourcing Strategy Workbench</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
   <script type="module" src="app.js"></script>
 </head>
 <body>
-  <a class="skip" href="#workbench">Skip to the workbench</a>
-  <div class="noise" aria-hidden="true"></div>
-  <header class="topbar">
-    <a class="brand" href="#top" aria-label="ScoutForge home">
-      <span class="brand-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <span class="brand-name">SCOUT<span>FORGE</span><small>INTELLIGENCE SYSTEMS</small></span>
-    </a>
-    <nav aria-label="Primary navigation"><a href="#workbench">THE WORKBENCH</a><a href="#method">HOW IT WORKS</a><a href="#provenance">DATA & INTEGRITY</a></nav>
-    <a class="topbar-github" href="https://github.com/abrar0205/ScoutForge" target="_blank" rel="noopener noreferrer"><span>OPEN SOURCE</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 18 18 5M7 5h11v11"/></svg></a>
-  </header>
-  <main id="top">
-    <section class="hero" aria-labelledby="hero-heading">
-      <div class="hero-topline"><span>PRODUCT / 001</span><span>HUMAN-IN-THE-LOOP SOURCING INTELLIGENCE</span><span class="hero-topline-end">INDEPENDENT RESEARCH PROJECT</span></div>
-      <div class="hero-grid">
-        <div class="hero-copy">
-          <p class="eyebrow"><span class="dot"></span> THE SOURCING STRATEGY SYSTEM</p>
-          <h1 id="hero-heading">THE SPACE<br/><span>BETWEEN</span><br/><em>TITLES.</em></h1>
-          <p class="hero-lede">The most useful candidates don't always have the exact job title. Build better searches from real skills, evidence and deliberate experimentation.</p>
-          <div class="hero-actions"><a class="button button-lime" href="#workbench">LAUNCH WORKBENCH <span aria-hidden="true">↗</span></a><a class="hero-secondary" href="#method">EXPLORE THE METHOD <span aria-hidden="true">↓</span></a></div>
-          <div class="hero-caption"><span class="mini-grid-mark">✣</span><span>SEARCH THE RELATIONSHIPS.<br/>NOT JUST THE KEYWORDS.</span></div>
+<a class="skip" href="#workbench">Skip to workbench</a>
+<header class="topbar">
+  <a class="brand" href="#top" aria-label="ScoutForge home"><span class="brand-mark" aria-hidden="true">S<span>✳</span></span><span>scoutforge<span class="brand-dot">.</span></span></a>
+  <nav aria-label="Site navigation"><a href="#workbench">Workbench</a><a href="#about">About the data</a><a href="https://github.com/abrar0205/ScoutForge" target="_blank" rel="noopener noreferrer" aria-label="ScoutForge source code on GitHub">GitHub ↗</a></nav>
+</header>
+<main id="top">
+  <section class="intro container" aria-labelledby="intro-title">
+    <div class="intro-main"><p class="eyebrow"><span class="pulse"></span> RECRUITING INTELLIGENCE / PUBLIC LAB</p>
+      <h1 id="intro-title">A better search<br/><em>starts with the role.</em></h1>
+      <p class="intro-text">Turn a job description into a clear, evidence-backed sourcing plan. No candidate scraping. No guesswork disguised as data.</p>
+      <a class="jump" href="#workbench">Open workbench <span aria-hidden="true">↘</span></a>
+    </div>
+    <div class="intro-art" aria-hidden="true">
+      <svg viewBox="0 0 480 290" role="img" focusable="false">
+        <defs><radialGradient id="glow"><stop stop-color="#79d7bd" stop-opacity=".15"/><stop offset="1" stop-color="#79d7bd" stop-opacity="0"/></radialGradient></defs>
+        <circle cx="254" cy="145" r="144" fill="url(#glow)"/>
+        <g stroke="#82d9c0" stroke-width="1.2" opacity=".43"><path d="M238 142 110 65 84 194 238 142 385 78 422 197 288 241 238 142 171 258 84 194"/><path d="M110 65 385 78M171 258 422 197" stroke-dasharray="3 7"/></g>
+        <g fill="#19292c" stroke="#7dcfb4" stroke-width="1.7"><circle cx="110" cy="65" r="13"/><circle cx="84" cy="194" r="11"/><circle cx="385" cy="78" r="13"/><circle cx="422" cy="197" r="11"/><circle cx="171" cy="258" r="11"/><circle cx="288" cy="241" r="12"/></g>
+        <circle cx="238" cy="142" r="35" fill="#a5f4bc"/><circle cx="238" cy="142" r="46" stroke="#a5f4bc" stroke-opacity=".42" fill="none"/>
+        <text x="238" y="147" fill="#11251d" font-size="13" font-family="DM Mono, monospace" text-anchor="middle" font-weight="bold">ROLE</text>
+        <g fill="#cbded6" font-size="10" font-family="DM Mono, monospace"><text x="35" y="40">TITLE</text><text x="30" y="227">SKILLS</text><text x="366" y="43">ADJACENCY</text><text x="380" y="226">SEARCH</text><text x="150" y="283">EVIDENCE</text></g>
+      </svg>
+      <div class="art-caption"><span>01 / READ</span><span>02 / EXPLORE</span><span>03 / EXPORT</span></div>
+    </div>
+  </section>
+
+  <section class="workbench container" id="workbench" aria-labelledby="workbench-title">
+    <div class="workspace-bar"><div><p class="eyebrow">YOUR WORKSPACE</p><h2 id="workbench-title">Build a sourcing plan</h2></div><div id="data-status" class="data-status"><span class="pulse"></span><span>Loading ESCO data…</span></div></div>
+    <div class="step-nav" role="tablist" aria-label="Sourcing workflow">
+      <button type="button" class="workflow-tab active" role="tab" aria-selected="true" aria-controls="panel-intake" data-stage="intake"><span>01</span> Define role</button>
+      <button type="button" class="workflow-tab" role="tab" aria-selected="false" aria-controls="panel-twin" data-stage="twin"><span>02</span> Build search</button>
+      <button type="button" class="workflow-tab" role="tab" aria-selected="false" aria-controls="panel-dossier" data-stage="dossier"><span>03</span> Export plan</button>
+    </div>
+
+    <section class="stage" role="tabpanel" id="panel-intake" aria-label="Define role">
+      <div class="two-column">
+        <div class="work-panel form-panel">
+          <div class="panel-heading"><div><span class="overline">STEP 01</span><h3>What role are you sourcing?</h3></div><p>Paste a job description, then review the skills we found in the text.</p></div>
+          <label for="role-title">Job title <span>Optional</span></label>
+          <input id="role-title" type="text" maxlength="100" placeholder="e.g. Industrial Automation Engineer" autocomplete="off"/>
+          <label for="job-description">Job description</label>
+          <textarea id="job-description" rows="10" maxlength="25000" placeholder="Paste the role description here…" spellcheck="true"></textarea>
+          <div class="input-meta"><span id="word-count">0 words</span><span>Processed on your device</span></div>
+          <div class="button-row"><button type="button" id="analyze" class="button primary">Analyze role <span aria-hidden="true">↗</span></button><button type="button" class="button subtle" id="example">Try example</button><button type="button" class="text-action" id="clear">Clear</button></div>
         </div>
-        <div class="hero-diagram" aria-label="Abstract illustration of a source-aware knowledge graph, not live candidate data">
-          <div class="diagram-top"><span>SCOUTFORGE / KNOWLEDGE SYSTEM</span><span>FIG. 01</span></div>
-          <svg id="hero-network" class="hero-network" viewBox="0 0 600 580" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <defs><radialGradient id="ring" cx="50%" cy="50%"><stop stop-color="#baee75" stop-opacity=".3"/><stop offset="1" stop-color="#baee75" stop-opacity="0"/></radialGradient></defs>
-            <g class="graph-grid"><path d="M0 90H600M0 180H600M0 270H600M0 360H600M0 450H600M0 540H600M90 0V580M180 0V580M270 0V580M360 0V580M450 0V580M540 0V580"/></g>
-            <circle cx="303" cy="290" r="190" class="radar-circle"/><circle cx="303" cy="290" r="125" class="radar-circle"/><circle cx="303" cy="290" r="68" fill="url(#ring)" />
-            <g class="hero-edges"><path d="M303 290L142 165M303 290L483 151M303 290L481 435M303 290L153 450M303 290L367 78M303 290L538 287M142 165L367 78M483 151L538 287M153 450L481 435M142 165L153 450"/></g>
-            <g class="orbit-points"><circle cx="142" cy="165" r="6"/><circle cx="483" cy="151" r="8"/><circle cx="481" cy="435" r="7"/><circle cx="153" cy="450" r="7"/><circle cx="367" cy="78" r="5"/><circle cx="538" cy="287" r="5"/></g>
-            <g class="svg-small"><text x="102" y="143">01 / SKILLS</text><text x="446" y="122">02 / ROLES</text><text x="424" y="470">03 / SEARCH</text><text x="95" y="479">04 / EVIDENCE</text><text x="311" y="53">05 / STRATEGY</text></g>
-            <circle cx="303" cy="290" r="51" fill="#b9f28e"/><circle cx="303" cy="290" r="62" stroke="#b9f28e" stroke-opacity=".3" fill="none"/><path d="M288 308 305 270 320 308M296 293h18" stroke="#102016" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <text x="303" y="365" text-anchor="middle" class="center-label">SOURCE-AWARE REASONING</text>
-          </svg>
-          <div class="diagram-bottom"><span>NOT CANDIDATE DATA</span><span class="rotating-marker">○ EXPLORE THE UNKNOWN</span></div>
-          <span class="diagram-side">SYSTEM MODEL / ABSTRACT RELATIONSHIPS</span>
+        <div class="work-panel review-panel">
+          <div class="panel-heading"><div><span class="overline" id="analysis-mode">RULE-BASED / SOURCE LINKED</span><h3>Review your skills</h3></div><p>Only explicitly matched terms are listed. You decide which ones belong in your search.</p></div>
+          <div class="blank-state" id="intake-empty"><span class="blank-glyph" aria-hidden="true">✳</span><strong>Ready when you are.</strong><p>Paste a role or try the example to see source-linked skill suggestions.</p></div>
+          <div id="intake-results" hidden>
+            <div class="results-summary"><strong id="results-title">Untitled role</strong><span id="match-count" class="count-chip">0 matches</span></div>
+            <p id="results-note" class="note">Matches are suggestions. Review each one.</p>
+            <div class="review-actions"><button type="button" id="select-all">Select all</button><button type="button" id="deselect-all">None</button></div>
+            <div id="requirements-list" class="requirements-list"></div>
+            <button type="button" id="show-more-skills" class="show-more" hidden>Show more matches ↓</button>
+            <label for="manual-skills" class="manual-label">Other useful terms <span>Optional</span></label>
+            <input id="manual-skills" type="text" placeholder="e.g. PLC, SCADA, TIA Portal (comma separated)"/>
+            <small class="muted-text">Your terms are kept separate from verified ESCO matches.</small>
+            <button class="button primary full next-step" type="button" data-goto="twin">Build sourcing searches <span aria-hidden="true">→</span></button>
+          </div>
         </div>
       </div>
-      <div class="hero-metadata"><span><b>01</b> EVIDENCE FIRST</span><span><b>02</b> ONTOLOGY-LINKED</span><span><b>03</b> HUMAN APPROVED</span><a href="#workbench">THE LAB BEGINS BELOW <span>↓</span></a></div>
     </section>
 
-    <section class="workbench-section" id="workbench" aria-labelledby="workbench-heading">
-      <div class="section-heading"><div><p class="eyebrow"><span class="dot"></span> IN THE WORKBENCH</p><h2 id="workbench-heading">SOURCE <span>WITH INTENT.</span></h2></div><div class="data-status" id="data-status" role="status"><span class="data-pulse"></span><span>CHECKING CLASSIFICATION…</span></div></div>
-      <div class="workbench-shell">
-        <div class="workspace-topbar"><div class="workspace-brand"><span class="workspace-id">S/F—001</span><span> SOURCING MISSION CONTROL</span></div><div><span class="workspace-research">NO CANDIDATE PROFILES · LOCAL JD PROCESSING</span><span class="workspace-version">V0.1 / RESEARCH PREVIEW</span></div></div>
-        <div class="workflow-nav" role="tablist" aria-label="Workbench stages">
-          <button class="workflow-tab active" type="button" role="tab" aria-selected="true" aria-controls="panel-intake" data-stage="intake"><span>01</span> ROLE INTELLIGENCE</button>
-          <button class="workflow-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-atlas" data-stage="atlas"><span>02</span> SKILLS ATLAS</button>
-          <button class="workflow-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-twin" data-stage="twin"><span>03</span> SEARCHTWIN</button>
-          <button class="workflow-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-dossier" data-stage="dossier"><span>04</span> DOSSIER</button>
+    <section class="stage" role="tabpanel" id="panel-twin" aria-label="Build search" hidden>
+      <div class="two-column">
+        <div class="work-panel query-panel">
+          <div class="panel-heading"><div><span class="overline">STEP 02 / SEARCHTWIN</span><h3>Choose a search approach</h3></div><p>Compare search structures; no candidate database is searched.</p></div>
+          <div id="strategy-picks" class="strategy-picks" role="group" aria-label="Select sourcing approach"></div>
+          <div class="query-label-row"><label for="query-input">Boolean search</label><span id="strategy-count" class="mono-muted"></span></div>
+          <textarea id="query-input" rows="8" spellcheck="false" aria-describedby="query-validation"></textarea>
+          <p id="query-validation" class="query-feedback" role="status">Enter a role first.</p>
+          <div id="search-diagnostics" class="diagnostics"></div>
+          <div class="button-row"><button type="button" id="copy-query" class="button primary">Copy search <span aria-hidden="true">↗</span></button><button type="button" class="button subtle" id="reset-query">Reset query</button></div>
         </div>
-        <div class="workspace-content">
-          <section class="stage active" role="tabpanel" id="panel-intake" aria-label="Role intelligence">
-            <div class="stage-grid stage-intake">
-              <div class="stage-pane intake-left">
-                <div class="pane-title"><span class="step-no">01 / INTAKE</span><h3>Decode a vacancy.</h3><p>Paste the job description. We extract exact skill mentions and preserve their source sentences for review.</p></div>
-                <div class="input-group"><label for="role-title">ROLE TITLE <span>RECRUITER EDITABLE</span></label><input id="role-title" type="text" maxlength="100" placeholder="e.g. Industrial Automation Engineer" spellcheck="false"/></div>
-                <div class="input-group"><label for="job-description">JOB DESCRIPTION <span>BROWSER ONLY</span></label><textarea id="job-description" rows="12" maxlength="25000" placeholder="Paste a real job description here…&#10;&#10;This project never asks for candidate names, CVs or personal details."></textarea><div class="textarea-foot"><span id="word-count">0 WORDS</span><span>MAX 25,000 CHARACTERS</span></div></div>
-                <div class="input-actions"><button type="button" id="analyze" class="button button-lime">ANALYZE ROLE <span>↗</span></button><button type="button" id="example" class="button button-outline">LOAD EXAMPLE</button><button type="button" id="clear" class="text-button">CLEAR</button></div>
-                <div class="privacy-line"><span class="shield-icon">◇</span><p>Private by design. JD parsing runs on your device. No uploads, no candidate ranking, no automated outreach.</p></div>
-              </div>
-              <div class="stage-pane insight-right">
-                <div class="pane-overline"><span>INTELLIGENCE OUTPUT</span><span id="analysis-mode">RULES-BASED / SOURCE-LINKED</span></div>
-                <div id="intake-empty" class="empty-state"><span class="empty-symbol">⌘</span><h3>Every strategy<br/>starts with evidence.</h3><p>Load a role brief to see the extracted skill concepts, supporting text and recruiter review controls.</p><span class="empty-foot">AWAITING ROLE INPUT / NO CLAIMS GENERATED</span></div>
-                <div id="intake-results" class="intake-results" hidden>
-                  <div class="results-head"><div><span class="mini-label">REVIEW BEFORE USE</span><h3 id="results-title">Role intelligence</h3></div><span id="match-count" class="number-chip">0</span></div>
-                  <p class="results-note" id="results-note">Verified taxonomy matches are not automatically required qualifications. Review each one.</p>
-                  <div class="filter-row"><span>IDENTIFIED CONCEPTS</span><button type="button" id="select-all">SELECT ALL</button><button type="button" id="deselect-all">CLEAR SELECTION</button></div>
-                  <div id="requirements-list" class="requirements-list"></div>
-                  <div class="manual-terms"><label for="manual-skills">RECRUITER TERMS (OPTIONAL)</label><input id="manual-skills" type="text" placeholder="Add terms, separated by commas (e.g. TIA Portal, PLC)"/><p>Manually supplied terms are not claimed as ESCO matches.</p></div>
-                  <button type="button" class="next-link" data-goto="atlas">EXPLORE RELATED OCCUPATIONS <span>↗</span></button>
-                </div>
-              </div>
-            </div>
-          </section>
-          <section class="stage" role="tabpanel" id="panel-atlas" aria-label="Skills atlas" hidden>
-            <div class="stage-grid atlas-layout">
-              <div class="stage-pane atlas-description"><span class="step-no">02 / SKILLS ATLAS</span><h3>Find the adjacent.</h3><p>Explore occupations linked to the same ESCO skills. Relationships are drawn from the classification—not generated by an LLM.</p><div class="atlas-source"><span>CLASSIFICATION</span><b id="atlas-version">AWAITING DATA</b><span>RELATIONSHIP TYPE</span><b>ESCO ESSENTIAL / OPTIONAL</b><span>INTERPRETATION</span><b>SEARCH DISCOVERY ONLY</b></div><div class="atlas-controls"><label for="atlas-search">FILTER RELATED OCCUPATIONS</label><input id="atlas-search" type="search" placeholder="Filter occupation names…"/></div><button class="next-link" type="button" data-goto="twin">COMPARE SOURCING STRATEGIES <span>↗</span></button></div>
-              <div class="stage-pane atlas-output"><div class="pane-overline"><span>OCCUPATION CONNECTION MAP</span><span id="atlas-total">NO SELECTED CONCEPTS</span></div><div id="graph" class="atlas-graph" role="img" aria-label="Skill-to-occupation relationship visualization"></div><div id="occupation-list" class="occupation-list"></div><p class="graph-disclaimer">Shared ESCO skill links suggest search pathways. They do not measure candidate suitability, supply, or probabilities.</p></div>
-            </div>
-          </section>
-          <section class="stage" role="tabpanel" id="panel-twin" aria-label="SearchTwin strategy laboratory" hidden>
-            <div class="stage-intro"><div><span class="step-no">03 / SEARCHTWIN</span><h3>Search is a hypothesis.<br/><em>Test the structure.</em></h3></div><p>Change the trade-off between title precision and skill breadth. Every query is editable, validated and ready for a human to review on their sourcing platform.</p></div>
-            <div id="strategy-cards" class="strategy-cards"></div>
-            <div class="strategy-explainer"><span class="beacon">✣</span><p><strong>No fabricated sourcing results.</strong> Query length, title alternatives and selected concepts are structural measures only. We cannot know candidate counts or response rates without authorized execution and real tracking.</p></div>
-          </section>
-          <section class="stage" role="tabpanel" id="panel-dossier" aria-label="Sourcing dossier" hidden>
-            <div class="stage-grid dossier-layout"><div class="stage-pane dossier-left"><span class="step-no">04 / STRATEGY DOSSIER</span><h3>Make the work<br/>transferable.</h3><p>Export a documented sourcing brief that a recruiter or hiring manager can review, correct and execute.</p><div class="input-group"><label for="reviewer-notes">REVIEWER NOTES</label><textarea id="reviewer-notes" rows="6" maxlength="3000" placeholder="Decisions to validate, market observations, constraints, questions for the hiring manager…"></textarea></div><div class="export-actions"><button type="button" id="export-md" class="button button-lime">DOWNLOAD DOSSIER <span>↗</span></button><button type="button" id="export-csv" class="button button-outline">EXCEL-READY CSV</button><button type="button" id="print-dossier" class="text-button">PRINT SUMMARY</button></div><p class="export-notice">Export contains only the JD and reviewer-entered strategy. Do not include identifiable candidate information.</p></div><div class="stage-pane dossier-right"><div class="pane-overline"><span>DOSSIER PREVIEW</span><span>LIVE / LOCAL</span></div><div id="dossier-preview" class="dossier-preview"></div></div></div>
-          </section>
+        <div class="work-panel explain-panel">
+          <div class="panel-heading"><div><span class="overline">WHY THIS SEARCH?</span><h3>See your search logic</h3></div><p id="twin-interpretation">Choose a strategy to inspect its structure and coverage.</p></div>
+          <div class="evidence-board"><div class="evidence-row"><span>Title alternatives</span><strong id="metric-titles">0</strong></div><div class="evidence-row"><span>Selected skill terms</span><strong id="metric-skills">0</strong></div><div class="evidence-row"><span>Taxonomy matches</span><strong id="metric-coverage">—</strong></div></div>
+          <p class="fine-print">Taxonomy matches are ESCO occupation descriptions satisfying the query, <strong>not candidate counts or live talent availability</strong>.</p>
+          <details id="related-details" class="related-details">
+            <summary>Explore related occupations <span aria-hidden="true">↗</span></summary>
+            <div class="related-inner"><p id="atlas-version" class="mono-muted">ESCO data loading…</p><label for="atlas-search">Filter by occupation</label><input id="atlas-search" type="search" placeholder="Filter related roles…"/><div id="graph" class="atlas-graph" role="img" aria-label="ESCO skill-to-occupation connections"></div><div id="occupation-list" class="occupation-list"></div><p id="atlas-total" class="fine-print"></p></div>
+          </details>
+          <button class="button subtle full next-step" type="button" data-goto="dossier">Prepare sourcing plan <span aria-hidden="true">→</span></button>
         </div>
-        <div class="workspace-footer"><span><span class="signal-dot"></span> EXPLAINABLE BY DESIGN</span><span id="workspace-hint">START WITH A REAL JOB DESCRIPTION.</span><span>SCOUTFORGE / V0.1</span></div>
       </div>
     </section>
-    <section id="method" class="method-section" aria-labelledby="method-title"><div class="method-top"><div><p class="eyebrow"><span class="dot"></span> PRINCIPLES / NOT PROMISES</p><h2 id="method-title">LESS MAGIC.<br/><em>MORE METHOD.</em></h2></div><p>AI-generated text is easy. Operational trust is harder. ScoutForge is designed so that each search decision is visible, editable and supported by a source.</p></div><div class="method-cards"><article><span>01 / PROVENANCE</span><div class="method-glyph">⌕</div><h3>Evidence, not vibes.</h3><p>Every extracted skill points back to the sentence in the original role description.</p></article><article><span>02 / EXPLORATION</span><div class="method-glyph">✣</div><h3>Adjacent by design.</h3><p>Use recorded occupation–skill relationships to explore viable search vocabulary.</p></article><article><span>03 / GOVERNANCE</span><div class="method-glyph">⌘</div><h3>The recruiter decides.</h3><p>Searches are recommendations to review, not automated candidate assessments.</p></article></div></section>
-    <section class="provenance-section" id="provenance"><div><p class="eyebrow"><span class="dot"></span> OPEN RESEARCH / SOURCE NOTES</p><h2>KNOW WHAT YOU<br/><span>KNOW.</span></h2></div><div class="source-copy"><p>This application uses the ESCO classification of the European Commission. The first snapshot is an English subset from ESCO v1.2.0, with source revision and retrieval date displayed in the workbench. ESCO is a taxonomy—not a live candidate supply database.</p><a href="https://esco.ec.europa.eu/en/use-esco/download" target="_blank" rel="noopener noreferrer">VIEW THE EUROPEAN COMMISSION SOURCE ↗</a><p>ScoutForge is an independent software project. It is not affiliated with Tesla, LinkedIn or the European Commission. No personal candidate records are required or stored by the product.</p></div></section>
-  </main>
-  <footer class="footer"><a href="#top" class="footer-brand">SCOUT<span>FORGE.</span></a><span>THE INTELLIGENCE BEHIND EVERY SEARCH.</span><a href="https://github.com/abrar0205/ScoutForge" target="_blank" rel="noopener noreferrer">SOURCE CODE ↗</a></footer>
+
+    <section class="stage" role="tabpanel" id="panel-dossier" aria-label="Export plan" hidden>
+      <div class="two-column">
+        <div class="work-panel export-panel">
+          <div class="panel-heading"><div><span class="overline">STEP 03</span><h3>Ready to hand off?</h3></div><p>Review the communication draft, add context, and export a sourcing brief.</p></div>
+          <label for="outreach-draft">Outreach starting point <span>Editable, never sent</span></label>
+          <textarea id="outreach-draft" rows="8" placeholder="Analyze a role to prepare a draft."></textarea>
+          <button type="button" id="copy-outreach" class="text-action left-action">Copy outreach draft ↗</button>
+          <label for="reviewer-notes">Recruiter notes <span>Optional</span></label>
+          <textarea id="reviewer-notes" rows="4" maxlength="3000" placeholder="Hiring manager questions, location, constraints, review notes…"></textarea>
+          <div class="button-row export-actions"><button type="button" id="export-md" class="button primary">Download brief <span aria-hidden="true">↓</span></button><button type="button" id="export-csv" class="button subtle">Excel-ready CSV</button></div>
+        </div>
+        <div class="work-panel preview-panel">
+          <div class="panel-heading"><div><span class="overline">AT A GLANCE</span><h3>Plan preview</h3></div><p>Your selection is assembled locally. No unverified metrics or applicant records.</p></div>
+          <div id="dossier-preview" class="dossier-preview"></div>
+          <div class="privacy-foot"><span aria-hidden="true">◇</span><span>Human approval required. No candidate ranking, scraping or automatic outreach.</span></div>
+        </div>
+      </div>
+    </section>
+    <div class="workspace-foot"><span><span class="pulse"></span> PRIVATE BROWSER WORKSPACE</span><span id="workspace-hint">START WITH A JOB DESCRIPTION.</span><span>V0.2 / RECRUITER CONTROLLED</span></div>
+  </section>
+
+  <section id="about" class="about container"><div><p class="eyebrow">THE DATA BEHIND IT</p><h2>Source-linked, not black-box.</h2></div><div><p>ScoutForge uses a published subset of the European Commission's ESCO occupation–skill classification to suggest terms and adjacent roles. The search comparison tests only taxonomy records, never people. Your role text stays in this browser session.</p><a href="https://esco.ec.europa.eu/en/use-esco/download" target="_blank" rel="noopener noreferrer">View ESCO data source ↗</a></div></section>
+</main>
+<footer class="footer container"><span class="footer-logo">scoutforge<span>.</span></span><span>Independent sourcing research project · Not affiliated with any employer or recruiting platform.</span><a href="https://github.com/abrar0205/ScoutForge" target="_blank" rel="noopener noreferrer">View code ↗</a></footer>
 </body>
 </html>
