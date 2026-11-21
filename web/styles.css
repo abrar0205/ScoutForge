@@ -472,3 +472,8 @@ body {
   .mainnav a, .gh, .btn, .chip-btn, .chip, .tab { transition: none; }
   .btn:active, .chip-btn:active { transform: none; }
 }
+
+/* The desktop results columns must not override the original tablet/mobile breakpoints. */
+@media (max-width: 1080px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+}
