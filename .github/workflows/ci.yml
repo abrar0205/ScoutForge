@@ -64,4 +64,4 @@ jobs:
       - name: Build fingerprinted website
         run: python scripts/build_site.py
       - name: Run desktop/mobile workflow regression against packaged site
-        run: SCOUTFORGE_SITE_ROOT=_site SCOUTFORGE_REAL_MODULES=1 python tests/browser_smoke.py
+        run: SCOUTFORGE_SITE_ROOT=_site SCOUTFORGE_REAL_MODULES=1 SCOUTFORGE_REAL_TALENT=1 python tests/browser_smoke.py

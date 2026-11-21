@@ -79,9 +79,10 @@ try:
     assert page.locator('.talent-profile').count()>=1
     assert 'WHAT-IF' in page.locator('.talent-profile').first.inner_text()
     # Session-only CSV import includes no names, email, phone or other PII.
-    page.locator('#talent-import-csv').set_input_files({'name':'safe-import.csv','mimeType':'text/csv','buffer':b'id,title,skills,region\nIMPORT-1,Technical coordinator,Hydraulics|Excel,Leipzig\n'})
-    page.locator('#talent-search').fill('Hydraulics')
-    assert 'Technical coordinator' in page.locator('#talent-profile-list').inner_text()
+    page.locator('#talent-import-csv').set_input_files({'name':'safe-import.csv','mimeType':'text/csv','buffer':b'id,title,skills,region\nIMPORT-1,Technical coordinator,DemoHydraulicsXYZ|Excel,Leipzig\n'})
+    page.wait_for_function("window.scoutforgeTalent?.getProfiles().some(p=>p.id==='LOCAL-IMPORT-1')",timeout=10000)
+    page.locator('#talent-search').fill('DemoHydraulicsXYZ')
+    page.wait_for_function("document.querySelector('#talent-profile-list')?.textContent.includes('Technical coordinator')",timeout=10000)
     # Exact screenshot repro: title supplied, description only 'python' - must NOT be empty.
     page.locator('#job-description').fill('python')
     page.locator('.optional-input summary').click()
