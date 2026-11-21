@@ -1,0 +1,78 @@
+{
+  "about": "Authored evaluation set for ScoutForge term extraction. These job descriptions were written for this benchmark to resemble typical Berlin-Brandenburg manufacturing roles; they are not copies of real job postings. Gold labels were written before running either engine: 'relevant' lists every term a sourcer would reasonably put in a search for the role; 'must' lists the requirements a search must cover. Matching is case-insensitive and accepts a term if it contains a gold phrase as a whole word.",
+  "version": "2026.11",
+  "roles": [
+    {
+      "id": "automation-sample",
+      "jd": "Industrial Automation Engineer\n\nWe are hiring an automation engineer for a high-volume manufacturing plant.\nExperience with PLCs, Siemens S7 and TIA Portal is important. You will troubleshoot industrial automation systems, maintain electrical equipment and improve production reliability.\nKnowledge of Python, SQL, preventive maintenance and quality control would be useful. This role involves communication with maintenance and production teams.",
+      "relevant": ["plc", "siemens s7", "simatic", "tia portal", "industrial automation", "automation", "troubleshoot", "electrical equipment", "electrical maintenance", "python", "sql", "preventive maintenance", "quality control"],
+      "must": ["plc", "siemens s7", "tia portal"]
+    },
+    {
+      "id": "maintenance-robotics",
+      "jd": "Maintenance Technician – Body Shop (m/w/d)\nWhat you'll do:\n- Troubleshoot and repair KUKA and FANUC robots during 3-shift operation\n- Maintain Siemens S7 PLCs using TIA Portal\n- Read electrical schematics and carry out preventive maintenance\nWhat you'll bring:\n- Completed vocational training as Mechatroniker or Elektroniker für Betriebstechnik\n- Experience with hydraulics and pneumatics\n- German and English\nNice to have:\n- Experience with SAP PM",
+      "relevant": ["kuka", "fanuc", "robot", "robotics", "plc", "siemens s7", "simatic", "tia portal", "schematics", "preventive maintenance", "troubleshoot", "mechatroniker", "mechatronics", "elektroniker", "hydraulics", "pneumatics", "sap pm", "cmms"],
+      "must": ["kuka", "fanuc", "plc", "hydraulics", "pneumatics"]
+    },
+    {
+      "id": "quality-engineer",
+      "jd": "Supplier Quality Engineer\nYou will lead supplier audits, drive 8D problem solving and approve PPAP submissions for battery and drive-unit components.\nRequirements:\n- Degree in mechanical engineering or similar\n- Strong knowledge of IATF 16949, VDA 6.3 and FMEA\n- Statistical process control and measurement system analysis\n- Fluent English, German is a plus\nPreferred: Six Sigma Green Belt, experience in automotive or battery manufacturing.",
+      "relevant": ["8d", "ppap", "iatf 16949", "vda 6.3", "fmea", "spc", "statistical process control", "measurement system analysis", "msa", "supplier quality", "six sigma", "green belt", "battery", "automotive", "apqp", "quality"],
+      "must": ["iatf 16949", "fmea", "8d", "ppap"]
+    },
+    {
+      "id": "logistics-associate",
+      "jd": "Logistics Associate – Intralogistics\nYou will supply production lines with material, operate forklifts and keep warehouse stock accurate in SAP EWM.\nYour profile:\n- Valid forklift licence (Staplerschein)\n- Experience in warehouse or intralogistics operations\n- Willingness to work in a 3-shift system\n- Basic German skills\nExperience with lean principles is an advantage.",
+      "relevant": ["forklift", "staplerschein", "warehouse", "intralogistics", "lagerlogistik", "sap", "ewm", "lean", "logistics", "material"],
+      "must": ["forklift", "warehouse"]
+    },
+    {
+      "id": "data-analyst-production",
+      "jd": "Data Analyst – Production Analytics\nBuild dashboards that track OEE, scrap and downtime across the paint shop and general assembly.\nWhat you bring:\n- Advanced SQL and Python (pandas)\n- Power BI or Tableau\n- Experience with MES data and manufacturing KPIs\n- Clear communication with engineers and managers\nNice to have: Databricks, machine learning basics.",
+      "relevant": ["sql", "python", "pandas", "power bi", "tableau", "mes", "manufacturing execution", "dashboards", "data analysis", "analytics", "databricks", "data engineering", "machine learning", "oee"],
+      "must": ["sql", "python", "power bi"]
+    },
+    {
+      "id": "recruiter-sourcing",
+      "jd": "AI Automation Intern – Sourcing\nYou will build AI-assisted sourcing workflows such as Boolean string generation, talent mapping and outreach drafting, and automate recruiting tasks with Python, Excel and low-code tools like Power Automate.\nRequirements:\n- Hands-on experience with generative AI tools and prompt design\n- Advanced Excel skills (pivot tables, data analysis)\n- Interest in active sourcing with LinkedIn Recruiter\nVBA, SQL or Zapier experience is a plus. German is preferred.",
+      "relevant": ["boolean", "talent mapping", "outreach", "python", "excel", "pivot", "power automate", "low-code", "generative ai", "prompt", "llm", "active sourcing", "sourcing", "linkedin recruiter", "vba", "macros", "sql", "zapier", "data analysis", "rpa"],
+      "must": ["generative ai", "excel", "sourcing"]
+    },
+    {
+      "id": "process-engineer-battery",
+      "jd": "Process Engineer – Battery Cell Manufacturing\nOwn the coating and calendering processes in our cell factory. Drive yield improvement with DOE and SPC, write work instructions and support ramp-up.\nRequirements: degree in chemical, mechanical or process engineering; 3+ years in battery cell or similar high-volume production; experience with root cause analysis and FMEA. Python for data analysis is a plus.",
+      "relevant": ["battery", "cell", "process engineering", "process improvement", "spc", "statistical process control", "fmea", "root cause", "troubleshoot", "python", "data analysis", "doe", "coating", "calendering"],
+      "must": ["battery", "spc", "fmea"]
+    },
+    {
+      "id": "plc-german",
+      "jd": "SPS-Programmierer (m/w/d)\nIhre Aufgaben:\n- Programmierung und Inbetriebnahme von Siemens S7-1500 Steuerungen im TIA Portal\n- Fehlersuche an PROFINET-Netzwerken und WinCC-Visualisierungen\n- Optimierung bestehender Anlagen\nIhr Profil:\n- Abgeschlossene Ausbildung als Elektroniker für Automatisierungstechnik oder Techniker\n- Erfahrung mit Roboterprogrammierung (KUKA) von Vorteil\n- Gute Deutschkenntnisse",
+      "relevant": ["sps", "plc", "siemens s7", "s7-1500", "simatic", "tia portal", "profinet", "wincc", "scada", "fehlersuche", "troubleshoot", "elektroniker", "techniker", "meister", "kuka", "roboter", "robot", "inbetriebnahme", "commissioning"],
+      "must": ["siemens s7", "tia portal", "profinet"]
+    },
+    {
+      "id": "ehs-specialist",
+      "jd": "EHS Specialist\nSupport occupational safety and environmental compliance for the stamping and casting shops. Conduct risk assessments, incident investigations and safety trainings, and maintain our ISO 14001 and EMAS certification.\nRequirements: qualification as Fachkraft für Arbeitssicherheit or equivalent, knowledge of German health and safety law, excellent communication. Experience in automotive manufacturing is a plus.",
+      "relevant": ["ehs", "hse", "occupational safety", "arbeitssicherheit", "arbeitsschutz", "iso 14001", "emas", "environmental", "risk assessment", "fachkraft für arbeitssicherheit", "automotive", "health and safety"],
+      "must": ["occupational safety", "iso 14001"]
+    },
+    {
+      "id": "software-mes",
+      "jd": "Software Engineer – Manufacturing Systems\nDevelop services that connect production equipment to our manufacturing execution system. You will write backend services in C# and Python, design SQL schemas and integrate machines via OPC UA.\nRequirements: 3+ years of software engineering, strong C# / .NET, SQL, Git and CI pipelines. Docker and Kubernetes are a plus, as is experience with PLC data.",
+      "relevant": ["c#", ".net", "python", "sql", "opc ua", "mes", "manufacturing execution", "git", "ci", "docker", "kubernetes", "plc", "software", "backend"],
+      "must": ["c#", "sql", "opc ua"]
+    },
+    {
+      "id": "skill-list",
+      "jd": "PLC, TIA Portal, KUKA",
+      "relevant": ["plc", "tia portal", "kuka", "siemens", "simatic"],
+      "must": ["plc", "tia portal", "kuka"]
+    },
+    {
+      "id": "shift-lead-assembly",
+      "jd": "Shift Leader General Assembly\nLead a team of 25 production associates on a rotating shift. Ensure safety, quality and output targets, run daily shift meetings and drive continuous improvement (Kaizen).\nRequirements: experience leading production teams in automotive or similar industries, knowledge of lean manufacturing and 5S, SAP basics. Meister or Techniker qualification preferred. German and English required.",
+      "relevant": ["lean", "kaizen", "continuous improvement", "5s", "automotive", "sap", "meister", "techniker", "production", "shift", "assembly", "team lead"],
+      "must": ["lean"]
+    }
+  ]
+}

@@ -33,12 +33,14 @@ jobs:
           assert all(l['id'] in ids for o in d['occupations'] for l in o['skills'])
           print(d['counts'])
           PY
+      - name: Rebuild the compact browser index
+        run: python scripts/build_esco_index.py
       - name: Commit derived ESCO snapshot (no raw data or personal information)
         run: |
-          if ! git diff --quiet -- web/data/esco.json || ! git ls-files --error-unmatch web/data/esco.json >/dev/null 2>&1; then
+          if ! git diff --quiet -- web/data/esco.json web/data/esco-index.json || ! git ls-files --error-unmatch web/data/esco.json >/dev/null 2>&1; then
             git config user.name 'scoutforge-data-bot'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add web/data/esco.json
+            git add web/data/esco.json web/data/esco-index.json
             git commit -m 'data: publish verified ESCO v1.2.0 occupation-skill subset'
             git push
           fi

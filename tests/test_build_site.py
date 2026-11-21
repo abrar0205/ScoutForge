@@ -1,77 +1,58 @@
-"""Regression protection against mixed-release CSS / JS on GitHub Pages."""
+"""Release build: fingerprinted assets, resolved imports, no raw ESCO dump, no external hosts."""
+import json
 import re
 import tempfile
 import unittest
 from pathlib import Path
-from scripts.build_site import build_site
+
+from scripts.build_site import build_site, module_imports
 
 ROOT = Path(__file__).resolve().parent.parent
 
 
 class BuildSiteTests(unittest.TestCase):
-    def test_all_frontend_assets_are_fingerprinted_and_imports_resolve(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            out = Path(tmp) / 'release'
-            m = build_site(ROOT / 'web', out)
-            self.assertEqual(set(m), {'styles.css', 'app.js', 'engine.js', 'xlsx.js', 'talent.js', 'talent-ui.js'})
-            html = (out / 'index.html').read_text()
-            app = (out / m['app.js']).read_text()
-            css = (out / m['styles.css']).read_text()
-            for asset in m.values():
-                self.assertTrue((out / asset).is_file())
-                self.assertRegex(asset, r'\.[0-9a-f]{12}\.(?:js|css)$')
-            self.assertIn(f'href="{m["styles.css"]}"', html)
-            self.assertIn(f'src="{m["app.js"]}"', html)
-            self.assertIn(f"from './{m['engine.js']}'", app)
-            self.assertIn(f"from './{m['xlsx.js']}'", app)
-            self.assertIn('--bg:#f6f7fa', css)
-            self.assertNotIn('src="app.js"', html)
-            self.assertNotIn('href="styles.css"', html)
-            self.assertFalse((out / 'styles.css').exists())
-            self.assertFalse((out / 'app.js').exists())
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.out = Path(self.tmp.name) / "release"
+        self.assets = build_site(ROOT / "web", self.out)
 
-    def test_esco_source_generates_sqlite_and_json_snapshots(self):
-        import json, sqlite3, shutil
-        with tempfile.TemporaryDirectory() as tmp:
-            source = Path(tmp) / 'source'
-            shutil.copytree(ROOT / 'web', source)
-            catalog = {
-                'source': 'European Commission ESCO', 'version': '1.2.0',
-                'skills': [{'id': 's1', 'name': 'Python'}, {'id': 's2', 'name': 'PLC'}],
-                'occupations': [{'id': 'o1', 'name': 'automation engineer', 'skills': [{'id': 's1'}, {'id': 's2'}]}],
-            }
-            (source / 'data' / 'esco.json').write_text(json.dumps(catalog))
-            out = Path(tmp) / 'release'
-            build_site(source, out)
-            data = json.loads((out / 'data' / 'talent-sandbox.json').read_text())
-            self.assertEqual(data['counts']['profiles'], 3)
-            self.assertEqual(data['kind'], 'synthetic_talent_sandbox')
-            with sqlite3.connect(out / 'data' / 'talent-sandbox.sqlite') as con:
-                self.assertEqual(con.execute('SELECT count(*) FROM profiles').fetchone()[0], 3)
+    def tearDown(self):
+        self.tmp.cleanup()
 
-    def test_css_change_changes_release_filename(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            source = Path(tmp) / 'source'
-            import shutil
-            shutil.copytree(ROOT / 'web', source)
-            a = build_site(source, Path(tmp) / 'r1')
-            with (source / 'styles.css').open('a') as f:
-                f.write('\n/* stylesheet update */\n')
-            b = build_site(source, Path(tmp) / 'r2')
-            self.assertNotEqual(a['styles.css'], b['styles.css'])
-            self.assertEqual(a['app.js'], b['app.js'])
+    def test_every_asset_is_fingerprinted_and_referenced(self):
+        html = (self.out / "index.html").read_text()
+        self.assertIn(f'href="{self.assets["styles.css"]}"', html)
+        self.assertIn(f'src="js/{self.assets["js/app.js"]}"', html)
+        self.assertNotIn('src="js/app.js"', html)
+        for rel, name in self.assets.items():
+            self.assertRegex(name, r"\.[0-9a-f]{12}\.(js|css)$")
+        self.assertFalse((self.out / "styles.css").exists())
+        self.assertEqual(sorted(p.name for p in (self.out / "js").glob("*.js")), sorted(v for k, v in self.assets.items() if k.startswith("js/")))
 
-    def test_app_change_changes_release_filename(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            source = Path(tmp) / 'source'
-            import shutil
-            shutil.copytree(ROOT / 'web', source)
-            a = build_site(source, Path(tmp) / 'r1')
-            with (source / 'app.js').open('a') as f:
-                f.write('\n// release update\n')
-            b = build_site(source, Path(tmp) / 'r2')
-            self.assertNotEqual(a['app.js'], b['app.js'])
+    def test_imports_point_to_fingerprinted_modules_that_exist(self):
+        for path in (self.out / "js").glob("*.js"):
+            for dep in module_imports(path.read_text()):
+                self.assertRegex(dep, r"\.[0-9a-f]{12}\.js$", f"{path.name} imports unhashed {dep}")
+                self.assertTrue((self.out / "js" / dep).is_file(), dep)
+
+    def test_raw_esco_snapshot_is_not_published_but_index_is(self):
+        self.assertFalse((self.out / "data" / "esco.json").exists())
+        self.assertTrue((self.out / "data" / "esco-index.json").is_file())
+        self.assertTrue((self.out / "data" / "eval.json").is_file())
+
+    def test_no_external_hosts_in_page_or_styles(self):
+        html = (self.out / "index.html").read_text()
+        css = (self.out / self.assets["styles.css"]).read_text()
+        for text in (html, css):
+            self.assertNotRegex(text, r"fonts\.googleapis|fonts\.gstatic|cdn\.|unpkg|jsdelivr")
+        for m in re.finditer(r"url\('([^']+)'\)", css):
+            self.assertTrue((self.out / m.group(1)).is_file(), m.group(1))
+
+    def test_manifest(self):
+        manifest = json.loads((self.out / "asset-manifest.json").read_text())
+        self.assertEqual(manifest["release_format"], 2)
+        self.assertEqual(manifest["assets"], self.assets)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

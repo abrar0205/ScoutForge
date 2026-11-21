@@ -1,4 +1,4 @@
-name: ScoutForge release validation
+name: ScoutForge CI
 on:
   push:
     branches: [main]
@@ -13,41 +13,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify source and builder
-        run: python -m unittest discover -s tests -p 'test_*.py' -v
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Test Boolean compiler and sourcing strategy engine
+      - name: Syntax check browser modules
+        run: npm run check
+      - name: Engine, Boolean, outreach, AI adapter, ATS and workbook tests (+ benchmark guard)
         run: npm test
-      - name: Verify cache-safe static release build
+      - name: Benchmark report
+        run: node eval/run.mjs
+      - name: Build scripts and ESCO index tests
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Build cache-safe release
         run: python scripts/build_site.py
-      - name: Check browser modules
-        run: |
-          node --check web/app.js
-          node --check web/engine.js
-          node --check web/xlsx.js
-          node --check web/talent.js
-          node --check web/talent-ui.js
-      - name: Inspect ESCO-derived fictional profile SQLite/JSON release
-        run: |
-          python - <<'PY'
-          import json,sqlite3
-          from pathlib import Path
-          if Path('_site/data/esco.json').exists():
-            path=Path('_site/data/talent-sandbox.json')
-            d=json.loads(path.read_text())
-            assert d['kind']=='synthetic_talent_sandbox'
-            assert d['counts']['profiles']>1000
-            assert all(p['source']=='synthetic_esco' for p in d['profiles'])
-            con=sqlite3.connect('_site/data/talent-sandbox.sqlite')
-            assert con.execute('select count(*) from profiles').fetchone()[0]==d['counts']['profiles']
-            con.close()
-            print('Verified fictional talent snapshot:',d['counts'])
-          PY
-      - name: Validate published source data when available
-        run: |
-          if [ -f web/data/esco.json ]; then python -c "import json;d=json.load(open('web/data/esco.json'));assert d['counts']['occupations']>50"; fi
 
   browser:
     runs-on: ubuntu-24.04
@@ -57,11 +35,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install headless browser
+      - name: Install headless Chromium
         run: |
           python -m pip install playwright==1.56.0
           python -m playwright install --with-deps chromium
-      - name: Build fingerprinted website
+      - name: Build release
         run: python scripts/build_site.py
-      - name: Run desktop/mobile workflow regression against packaged site
-        run: SCOUTFORGE_SITE_ROOT=_site SCOUTFORGE_REAL_MODULES=1 SCOUTFORGE_REAL_TALENT=1 python tests/browser_smoke.py
+      - name: End-to-end flows at 1440px and 390px
+        run: SCOUTFORGE_SITE_ROOT=_site SCOUTFORGE_ARTIFACTS=e2e-artifacts python tests/browser_smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-artifacts
+          path: e2e-artifacts
+          retention-days: 7

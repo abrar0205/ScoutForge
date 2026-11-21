@@ -1,27 +1,122 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {extractTitle,extractRequirements,occupationsForSkills,validateBoolean,parseBoolean,queryMatches,createStrategies,taxonomyTest,cleanUserTerms,dossier,outreachDraft,GLOSSARY} from '../web/engine.js';
-import {buildWorkbook} from '../web/xlsx.js';
-const esco={source:'European Commission ESCO',version:'1.2.0',skills:[{id:'s:1',name:'program industrial robots',alt:''},{id:'s:2',name:'maintain equipment',alt:''},{id:'s:3',name:'PLC',alt:''}],occupations:[{id:'o:1',name:'automation technician',skills:[{id:'s:1',type:'essential'},{id:'s:2',type:'optional'},{id:'s:3',type:'essential'}]},{id:'o:2',name:'electrical technician',skills:[{id:'s:2',type:'essential'}]}]};
-test('recognizes exact Python-only screenshot reproduction even with no ESCO',()=>{const r=extractRequirements('python',null);assert.equal(r.length,1);assert.equal(r[0].name,'Python');assert.equal(r[0].provenance,'jd');assert.equal(r[0].evidence,'python');});
-test('python short prompt is not incorrectly treated as a job title',()=>assert.equal(extractTitle('python'),'Untitled role'));
-test('recognizes generic technologies without pretending they are ESCO concepts',()=>{const rs=extractRequirements('Experience in Python, SQL and Power Automate.',null);assert.deepEqual(rs.map(x=>x.name).sort(),['Power Automate','Python','SQL'].sort());assert.ok(rs.every(x=>x.provenance==='jd'));});
-test('unknown short skill is offered as an editable term not a factual ontology match',()=>{const x=extractRequirements('SpectroForge',null);assert.equal(x.length,1);assert.equal(x[0].name,'SpectroForge');assert.equal(x[0].provenance,'jd');});
-test('natural job title extraction and unsupported phrases',()=>{assert.equal(extractTitle('Industrial Automation Engineer\nUse PLC systems'),'Industrial Automation Engineer');assert.equal(extractTitle('We are hiring a technician who can operate equipment...'),'Untitled role');});
-test('ESCO links require supported source sentence',()=>{const x=extractRequirements('Role\nMust program industrial robots.\nPreferred: maintain equipment.',esco);assert.equal(x.find(y=>y.id==='s:1').provenance,'esco');assert.equal(x.find(y=>y.id==='s:2').type,'preferred');assert.match(x.find(y=>y.id==='s:1').source,/esco/);});
-test('PLC and plural PLCs are recognized as exact recruiter vocabulary',()=>{assert.ok(extractRequirements('PLCs are in use',esco).some(x=>x.name==='PLC'));assert.equal(extractRequirements('NoSQL data',esco).some(x=>x.name==='SQL'),false);});
-test('case insensitive skill evidence is captured, no general substring match',()=>{const x=extractRequirements('pYtHoN automation required',null);assert.equal(x.find(y=>y.name==='Python').evidence,'pYtHoN automation required');assert.equal(extractRequirements('NoSQL developer',null).some(x=>x.name==='SQL'),false);});
-test('occupation exploration uses recorded ESCO IDs only',()=>{const x=occupationsForSkills(esco,['s:1']);assert.equal(x.length,1);assert.equal(x[0].matched[0].id,'s:1');assert.deepEqual(occupationsForSkills(esco,['term:python']),[]);});
-test('search strategies are valid for role plus skills',()=>{const x=createStrategies({title:'Automation Engineer',roles:[{name:'automation technician'}],terms:['Python','PLC']});assert.equal(x.length,3);assert.ok(x.every(s=>validateBoolean(s.query).valid));assert.ok(x[0].query.includes('OR'));assert.ok(x[1].query.includes('AND'));assert.ok(x[2].query.includes('OR'));});
-test('single skill produces viable query with no job title',()=>{const x=createStrategies({title:'Untitled role',terms:['Python']});assert.equal(x[0].query,'("Python")');assert.ok(validateBoolean(x[0].query).valid);});
-test('title-only produces valid search without skills',()=>{const x=createStrategies({title:'Recruiter'});assert.equal(x.length,3);assert.ok(x.every(s=>validateBoolean(s.query).valid));});
-test('Boolean grammar respects precedence and NOT',()=>{const x=parseBoolean('"PLC" OR "maintain equipment" AND NOT "recruiter"');assert.ok(queryMatches(x,['PLC']));assert.ok(!queryMatches(x,['maintain equipment','recruiter']));});
-test('Boolean invalid syntax is rejected with actionable messages',()=>{for(const q of ['(PLC AND)','(PLC','PLC OR OR AI','"PLC" "AI"','PLC)','"missing','(NOT)','PLC OR',''])assert.equal(validateBoolean(q).valid,false,q);});
-test('taxonomy tests report records not candidate availability',()=>{const result=taxonomyTest(esco,'"automation technician" AND "PLC"');assert.deepEqual([result.matched,result.total],[1,2]);assert.match(result.note,/not people/i);});
-test('SQL search does not match NoSQL',()=>{const ast=parseBoolean('"SQL"');assert.equal(queryMatches(ast,['NoSQL developer']),false);assert.equal(queryMatches(ast,['SQL developer']),true);});
-test('free form recruiter terms allow commas newlines and semicolons',()=>assert.deepEqual(cleanUserTerms('PLC;PLC, HMI\nSCADA'),['PLC','HMI','SCADA']));
-test('unsent outreach template has personalization placeholders',()=>{const x=outreachDraft({title:'Automation Engineer',terms:['PLC']});assert.match(x,/\[specific, verified aspect/);assert.doesNotMatch(x,/LinkedIn|Tesla/);});
-test('dossier includes only approved terms and accurate source labels',()=>{const x=dossier({title:'Engineering',jd:'Python skills',requirements:[{id:'a',name:'Python',evidence:'Python skills',provenance:'jd'},{id:'b',name:'SCADA',evidence:'None',provenance:'esco'}],selected:['a'],source:esco});assert.match(x,/Python \[Exact term/);assert.doesNotMatch(x,/SCADA \[ESCO concept/);assert.match(x,/fictional sample profiles/);});
-test('glossary terms are explicitly inspectable',()=>{const p=GLOSSARY.find(x=>x.name==='Python');assert.ok(p.aliases.includes('python'));});
-test('native Excel workbook is a ZIP with expected worksheet paths',()=>{const buf=buildWorkbook({title:'Automation Engineer',terms:[{name:'Python',evidence:'Python',provenance:'jd'}],strategies:createStrategies({title:'Engineer',terms:['Python']})});assert.equal(buf[0],0x50);assert.equal(buf[1],0x4b);const ascii=new TextDecoder().decode(buf);assert.ok(ascii.includes('xl/worksheets/sheet5.xml'));assert.ok(ascii.includes('Activity tracker'));assert.ok(ascii.includes('Python'));});
-test('untrusted Excel formula stays inside an inline text cell',()=>{const buf=buildWorkbook({title:'=HYPERLINK("evil")',terms:[],strategies:[]});const content=new TextDecoder().decode(buf);assert.ok(content.includes('t="inlineStr"'));assert.ok(content.includes('=HYPERLINK(&quot;evil&quot;)'));assert.ok(!content.includes('<f>'));});
+import { analyzeRole, sentences, containsPhrase, detectTitle } from '../web/js/analyze.js';
+import { buildPack, validateBoolean, countGoogleWords, quote, GOOGLE_WORD_LIMIT } from '../web/js/boolean.js';
+import { SKILLS, TITLE_FAMILIES } from '../web/js/vocab.js';
+
+const SAMPLE = `Industrial Automation Engineer
+
+We are hiring an automation engineer for a high-volume manufacturing plant.
+Experience with PLCs, Siemens S7 and TIA Portal is important. You will troubleshoot industrial automation systems, maintain electrical equipment and improve production reliability.
+Knowledge of Python, SQL, preventive maintenance and quality control would be useful. This role involves communication with maintenance and production teams.`;
+
+test('v0.4 regression: the sample role selects PLC, Siemens S7 and TIA Portal and nothing unrelated', () => {
+  const a = analyzeRole(SAMPLE);
+  const sel = a.skills.filter((s) => s.selected).map((s) => s.name);
+  assert.deepEqual(sel, ['PLC programming', 'Siemens S7', 'TIA Portal']);
+  const all = a.skills.map((s) => s.name).join(' ').toLowerCase();
+  for (const junk of ['bridge', 'textile', 'fisheries', 'mining', 'ropes', 'plant health', 'high-volume recruiting']) assert.ok(!all.includes(junk), junk);
+});
+
+test('"would be useful" and "Nice to have" sections mark nice-to-haves', () => {
+  const a = analyzeRole(SAMPLE);
+  assert.equal(a.skills.find((s) => s.id === 'python').priority, 'nice');
+  const b = analyzeRole('Technician\nRequirements:\n- KUKA robots\nNice to have:\n- SAP PM');
+  assert.equal(b.skills.find((s) => s.id === 'kuka').priority, 'must');
+  assert.equal(b.skills.find((s) => s.id === 'cmms').priority, 'nice');
+});
+
+test('word boundaries: SQL does not match NoSQL, React needs the product name, Excel needs a capital', () => {
+  assert.equal(containsPhrase('We use NoSQL stores', 'sql'), false);
+  const a = analyzeRole('You react quickly and excel in a fast-paced team with a typical workday.');
+  assert.deepEqual(a.skills.map((s) => s.id), []);
+  const b = analyzeRole('Advanced Excel and React experience, Workday ATS.');
+  assert.deepEqual(b.skills.map((s) => s.id).sort(), ['ats', 'excel', 'javascript'].sort());
+});
+
+test('German job descriptions: SPS, Fehlersuche and gendered titles', () => {
+  const a = analyzeRole('SPS-Programmierer (m/w/d)\nIhre Aufgaben:\n- Programmierung von Siemens S7-1500 im TIA Portal\n- Fehlersuche an PROFINET-Netzwerken\nIhr Profil:\n- Erfahrung mit KUKA von Vorteil');
+  assert.equal(a.family.id, 'automation-engineer');
+  assert.equal(a.title, 'SPS-Programmierer');
+  assert.ok(a.titles.de.includes('SPS-Programmiererin'));
+  assert.equal(a.skills.find((s) => s.id === 'kuka').priority, 'nice');
+  assert.ok(a.skills.some((s) => s.id === 'troubleshooting'));
+});
+
+test('context such as shift work and industry is never a default keyword', () => {
+  const a = analyzeRole('Maintenance Technician\nWork in 3-shift operation in automotive body shop with KUKA robots.');
+  for (const s of a.skills.filter((x) => x.contextOnly)) assert.equal(s.selected, false);
+  assert.ok(a.skills.find((s) => s.id === 'kuka').selected);
+});
+
+test('titles: (m/w/d) is removed and the explicit title field wins', () => {
+  assert.equal(detectTitle('Mechatroniker (m/w/d)\nText'), 'Mechatroniker');
+  assert.equal(detectTitle('We are hiring.\nMore text'), '');
+  assert.equal(analyzeRole('KUKA', { title: 'Robot Programmer' }).title, 'Robot Programmer');
+});
+
+test('every skill and family entry is well formed', () => {
+  const ids = new Set();
+  for (const s of SKILLS) {
+    assert.ok(!ids.has(s.id), 'duplicate id ' + s.id); ids.add(s.id);
+    assert.ok(s.detect.length + s.exact.length > 0, s.id);
+    for (const l of ['en', 'de', 'pl']) assert.ok(s.search[l]?.length, `${s.id} missing ${l}`);
+    for (const p of s.detect) assert.equal(p, p.toLowerCase(), `${s.id}: detect phrases are lowercase`);
+  }
+  for (const f of TITLE_FAMILIES) for (const l of ['en', 'de', 'pl']) assert.ok(f.titles[l].length, `${f.id} ${l}`);
+});
+
+test('sentences keep section context', () => {
+  const s = sentences('Requirements:\n- PLC\nNice to have:\n- SAP');
+  assert.deepEqual(s.map((x) => x.section), ['must', 'nice']);
+});
+
+test('Boolean packs: categories are OR-grouped and AND-joined, strings validate on every platform', () => {
+  const a = analyzeRole('Maintenance Technician\nTroubleshoot KUKA and FANUC robots. Maintain Siemens S7 PLCs in TIA Portal.');
+  const p = buildPack({ titles: a.titles, skills: a.skills, familyId: a.family.id, langs: ['en', 'de'], strategy: 'balanced', locations: ['Berlin', 'Brandenburg'] });
+  assert.match(p.recruiter.keywords, /^\((FANUC OR KUKA|KUKA OR FANUC)\) AND \(PLC OR SPS/);
+  assert.match(p.recruiter.keywords, / NOT \(intern OR student/);
+  assert.ok(p.recruiter.title.includes('Instandhalterin'));
+  for (const [str, plat] of [[p.recruiter.title, 'recruiter'], [p.recruiter.keywords, 'recruiter'], [p.generic, 'recruiter'], [p.xray.query, 'xray']]) {
+    const v = validateBoolean(str, plat);
+    assert.ok(v.ok, `${plat}: ${v.errors.join(' ')} :: ${str}`);
+  }
+  assert.ok(p.xray.query.startsWith('site:linkedin.com/in '));
+  assert.ok(p.xray.words <= GOOGLE_WORD_LIMIT);
+  const narrow = buildPack({ titles: a.titles, skills: a.skills, familyId: a.family.id, langs: ['en'], strategy: 'narrow' });
+  assert.ok(narrow.recruiter.keywords.split(' AND ').length >= 3);
+});
+
+test('recruiter roles do not exclude recruiters; intern roles do not exclude students', () => {
+  const r = analyzeRole('Recruiter\nActive sourcing with LinkedIn Recruiter and Boolean search.');
+  assert.ok(!/NOT \([^)]*recruiter/i.test(buildPack({ titles: r.titles, skills: r.skills, familyId: r.family.id }).recruiter.keywords));
+  const i = analyzeRole('Praktikant Automatisierung\nSPS und TIA Portal.');
+  assert.ok(!/Praktikant|student/.test(buildPack({ titles: i.titles, skills: i.skills, familyId: i.family.id }).recruiter.keywords.split('NOT')[1] || ''));
+});
+
+test('X-ray stays inside the Google word budget and reports what it trimmed', () => {
+  const titles = { en: Array.from({ length: 12 }, (_, i) => `Title number ${i}`), de: [], pl: [] };
+  const skills = Array.from({ length: 8 }, (_, i) => ({ name: `Skill ${i}`, cat: 'X', selected: true, custom: true }));
+  const p = buildPack({ titles, skills, langs: ['en'], locations: ['Berlin', 'Potsdam', 'Cottbus', 'Eberswalde'] });
+  assert.ok(p.xray.words <= GOOGLE_WORD_LIMIT, p.xray.query);
+  assert.ok(p.xray.trimmed.length > 0);
+});
+
+test('validator catches broken strings', () => {
+  assert.deepEqual(validateBoolean('(PLC OR SPS').errors, ['A parenthesis is not closed.']);
+  assert.ok(validateBoolean('"TIA Portal').errors.length);
+  assert.ok(validateBoolean('PLC OR').errors.includes('The search ends with an operator.'));
+  assert.ok(validateBoolean('OR PLC').errors.some((e) => e.includes('nothing before it')));
+  assert.ok(validateBoolean('PLC or SPS').warnings.some((w) => w.includes('lowercase')));
+  assert.ok(validateBoolean('Mechatronik*').warnings.some((w) => w.includes('wildcards')));
+  assert.ok(validateBoolean('site:linkedin.com/in PLC NOT SPS', 'xray').warnings.some((w) => w.includes('Google does not support NOT')));
+  assert.ok(validateBoolean('“PLC”').errors.some((e) => e.includes('Curly')));
+  assert.equal(validateBoolean('(PLC OR SPS) AND "TIA Portal" NOT intern').ok, true);
+});
+
+test('quoting and counting', () => {
+  assert.equal(quote('TIA Portal'), '"TIA Portal"');
+  assert.equal(quote('C++'), 'C++');
+  assert.equal(quote('or'), '"or"');
+  assert.equal(countGoogleWords('site:linkedin.com/in ("Maintenance Technician" OR KUKA) -intern'), 5);
+});

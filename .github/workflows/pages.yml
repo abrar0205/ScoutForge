@@ -5,6 +5,7 @@ on:
     paths:
       - 'web/**'
       - 'scripts/build_site.py'
+      - 'eval/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 permissions:
@@ -25,32 +26,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify real ESCO dataset is included
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Tests must pass before publishing
         run: |
-          python3 - <<'PYI'
-          import json
-          from pathlib import Path
-          p=Path('web/data/esco.json')
-          assert p.is_file(), 'Verified ESCO snapshot missing'
-          d=json.loads(p.read_text())
-          assert d['source']=='European Commission ESCO'
-          assert d['counts']['occupations']>=100
-          assert d['counts']['relations']>=100
-          print('Verified source:',d['version'],d['counts'])
-          PYI
-      - name: Prepare versioned HTML/CSS/JavaScript release
+          npm test
+          python -m unittest discover -s tests -p 'test_*.py'
+      - name: Build fingerprinted release
         run: python scripts/build_site.py
-      - name: Verify fictional SQLite/JSON talent sandbox
-        run: |
-          python - <<'PY'
-          import json,sqlite3
-          d=json.load(open('_site/data/talent-sandbox.json'))
-          assert d['kind']=='synthetic_talent_sandbox'
-          assert d['counts']['profiles']>1000
-          with sqlite3.connect('_site/data/talent-sandbox.sqlite') as db:
-            assert db.execute('select count(*) from profiles').fetchone()[0]==d['counts']['profiles']
-          print('Verified fictional data:',d['counts'])
-          PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
