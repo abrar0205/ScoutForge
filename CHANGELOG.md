@@ -1,5 +1,17 @@
 # ScoutForge release notes
 
+## v1.2 — Cosmetic refinement and mobile navigation
+
+A design-only pass with the existing search, market, outreach, ATS, AI prompts and exports unchanged.
+
+- Improved typographic hierarchy, editorial hero, compact three-step guidance and focus on the job-description form.
+- Upgraded surface spacing, input affordance, selected skill chips, search platform hierarchy and download actions.
+- A restrained neutral-and-signal-yellow palette, hover/focus feedback and readable card/border contrast.
+- Fixed the narrow-screen top bar to show the full ScoutForge wordmark and all navigation links on a separate row.
+- Added browser screenshot checkpoints for the initial and generated workbench at 1440px and 390px and style assertions in CI.
+- Honours reduced-motion preferences and keeps assets self-hosted.
+
+
 ## v1.1 — Clearer interface
 
 A redesign of the interface only; the engine, outputs and benchmark are unchanged.

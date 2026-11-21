@@ -38,6 +38,16 @@ def run(page, base, width):
     assert any(re.match(r"^styles\.[0-9a-f]{12}\.css$", a) for a in assets), assets
     assert any(re.match(r"^js/app\.[0-9a-f]{12}\.js$", a) for a in assets), assets
     assert page.evaluate("getComputedStyle(document.body).fontFamily").startswith("Archivo"), "self-hosted font missing"
+    # Design regressions: visible brand/navigation at mobile width and readable primary action.
+    expect(page.locator(".intro-kicker")).to_be_visible()
+    assert page.locator(".hero-steps li").count() == 3
+    expect(page.locator("#analyze")).to_be_visible()
+    assert page.locator("#analyze").evaluate("(el) => getComputedStyle(el).backgroundColor") == "rgb(255, 206, 50)"
+    if width == 390:
+        expect(page.locator(".brand span")).to_be_visible()
+        expect(page.locator(".mainnav a")).to_have_count(4)
+        assert page.locator(".mainnav").evaluate("(el) => el.getBoundingClientRect().height") >= 40
+    page.screenshot(path=str(OUT / f"workbench-start-{width}.png"), full_page=True)
 
     # 1. The v0.4 failure case now produces a clean, specific search.
     page.fill("#jd", "Industrial Automation Engineer\n\nWe are hiring an automation engineer for a high-volume manufacturing plant.\nExperience with PLCs, Siemens S7 and TIA Portal is important. You will troubleshoot industrial automation systems.\nKnowledge of Python and SQL would be useful.")
@@ -45,6 +55,10 @@ def run(page, base, width):
     # The intake folds away so the results lead; the role title is visible below the sticky bar.
     expect(page.locator("#intro")).to_be_hidden()
     expect(page.locator("#role-title")).to_be_in_viewport()
+    assert page.locator('.out[data-platform="recruiter"]').evaluate(
+        "(el) => getComputedStyle(el).borderTopStyle"
+    ) == "solid"
+    page.screenshot(path=str(OUT / f"workbench-result-{width}.png"), full_page=True)
     kw = page.locator("#out-li-kw")
     expect(kw).to_have_value(re.compile(r"PLC OR SPS"))
     for junk in ["bridge", "textile", "fisheries", "ropes"]:
