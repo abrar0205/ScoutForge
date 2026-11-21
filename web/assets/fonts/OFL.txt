@@ -1,6 +1,6 @@
-Fonts in this folder (subset to Latin, Latin-1 and Latin Extended-A, converted to WOFF2):
-- Inter and Inter Display, Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter)
-- JetBrains Mono, Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
+Fonts in this folder (WOFF2):
+- Archivo (variable: weight 100-900, width 62-125), Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo). Latin subset from Fontsource, plus a Latin Extended-A subset for Polish.
+- JetBrains Mono, subset to Latin, Latin-1 and Latin Extended-A, Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
 
 Both are licensed under the SIL Open Font License, Version 1.1, reproduced below.
 

@@ -3,9 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ScoutForge · Sourcing copilot for manufacturing hiring</title>
-<meta name="description" content="Turn a job description into platform-ready Boolean searches in English, German and Polish, a Berlin-Brandenburg talent map, outreach drafts with a candidate-experience check, and an Excel tracker with live funnel metrics. Runs in your browser.">
+<title>ScoutForge: sourcing searches from a job description</title>
+<meta name="description" content="Paste a job description and get Boolean searches for LinkedIn Recruiter, Google and XING in English, German and Polish, a Berlin-Brandenburg talent map, a first message with a candidate-experience check, and an Excel tracker with live funnel metrics. Runs in your browser.">
+<meta name="theme-color" content="#2b3134">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <script type="module" src="js/app.js"></script>
 </head>
@@ -13,173 +15,202 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
   <div class="wrap topbar-inner">
-    <a class="brand" href="#workbench" aria-label="ScoutForge home">
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M7.5 10.5h6M10.5 7.5v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <a class="brand" href="#workbench" aria-label="ScoutForge, one role">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" fill="currentColor"/><circle cx="10.5" cy="10.5" r="4.2" fill="none" stroke="#f5b700" stroke-width="2"/><path d="M13.6 13.6 17.5 17.5" stroke="#f5b700" stroke-width="2.2" stroke-linecap="round"/></svg>
       <span>ScoutForge</span>
     </a>
     <nav class="mainnav" aria-label="Sections">
-      <a href="#workbench" data-view="workbench">Workbench</a>
-      <a href="#batch" data-view="batch">Batch</a>
-      <a href="#ats" data-view="ats">ATS data check</a>
-      <a href="#method" data-view="method">Method &amp; quality</a>
+      <a href="#workbench" data-view="workbench">One role</a>
+      <a href="#batch" data-view="batch">Many roles</a>
+      <a href="#ats" data-view="ats">ATS check</a>
+      <a href="#method" data-view="method">How it works</a>
     </nav>
-    <a class="gh" href="https://github.com/abrar0205/ScoutForge" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+    <a class="gh" href="https://github.com/abrar0205/ScoutForge" target="_blank" rel="noopener noreferrer">GitHub</a>
   </div>
 </header>
 
 <main id="main">
-<!-- ================================================================ WORKBENCH -->
+<!-- ================================================================ ONE ROLE -->
 <section id="view-workbench" class="view" data-view="workbench">
   <div class="wrap">
-    <div class="hero">
-      <p class="eyebrow">Sourcing copilot · Berlin-Brandenburg manufacturing</p>
-      <h1>From job description to a ready search pack in a minute.</h1>
-      <p class="lede">Platform-ready Boolean strings in English, German and Polish, a regional talent map, outreach that respects candidates, and an Excel tracker with live funnel metrics. Every term shows its evidence; nothing leaves your browser.</p>
+    <div id="intro" class="intro">
+      <div class="intro-copy">
+        <h1>Turn a job description into searches you can run.</h1>
+        <p class="lede">ScoutForge keeps only the skills it can point to in the text and writes Boolean searches for LinkedIn Recruiter, Google and XING, in English, German and Polish. Nothing leaves your browser.</p>
+        <figure class="specimen">
+          <p class="spec-src">“Maintain <mark>Siemens S7</mark> <mark>PLCs</mark> using <mark>TIA Portal</mark>.”</p>
+          <p class="spec-to" aria-hidden="true">becomes</p>
+          <code class="spec-out">(PLC OR SPS OR "Siemens S7" OR Simatic OR "TIA Portal" OR "STEP 7")</code>
+          <figcaption>Each term links back to the sentence it came from, and German synonyms are added for you.</figcaption>
+        </figure>
+      </div>
+
+      <form id="intake" class="card intake" autocomplete="off">
+        <div class="field-head">
+          <label for="jd" class="label">Job description <span class="hint">or a few skills</span></label>
+          <span id="jd-count" class="hint">0 words</span>
+        </div>
+        <textarea id="jd" rows="10" maxlength="30000" placeholder="Paste the full job description here, or type skills such as: PLC, TIA Portal, KUKA"></textarea>
+        <label for="title" class="label">Job title <span class="hint">optional, helps with title variants</span></label>
+        <input id="title" type="text" maxlength="100" placeholder="e.g. Maintenance Technician">
+        <div class="intake-actions">
+          <button type="submit" class="btn primary big" id="analyze">Build search pack</button>
+          <button type="button" class="btn ghost" id="clear">Clear</button>
+          <span class="hint kbd-hint">or press Ctrl + Enter</span>
+        </div>
+        <div class="examples" role="group" aria-labelledby="ex-label">
+          <span class="hint" id="ex-label">No job description to hand? Try one:</span>
+          <button type="button" class="chip-btn" data-example="maintenance">Maintenance Technician</button>
+          <button type="button" class="chip-btn" data-example="plc">SPS-Programmierer (German)</button>
+          <button type="button" class="chip-btn" data-example="quality">Supplier Quality Engineer</button>
+          <button type="button" class="chip-btn" data-example="logistics">Logistics Associate</button>
+          <button type="button" class="chip-btn" data-example="data">Production Data Analyst</button>
+        </div>
+      </form>
     </div>
 
-    <form id="intake" class="card intake" autocomplete="off">
-      <div class="intake-head">
-        <label for="jd" class="label">Job description, or a few skills</label>
-        <span id="jd-count" class="hint">0 words</span>
-      </div>
-      <textarea id="jd" rows="7" maxlength="30000" placeholder="Paste a job description, or type skills such as: PLC, TIA Portal, KUKA"></textarea>
-      <div class="intake-row">
-        <div class="field">
-          <label for="title" class="label small">Job title <span class="hint">(optional, improves title variants)</span></label>
-          <input id="title" type="text" maxlength="100" placeholder="e.g. Maintenance Technician">
-        </div>
-        <div class="intake-actions">
-          <button type="submit" class="btn primary" id="analyze">Build search pack</button>
-          <button type="button" class="btn ghost" id="clear">Clear</button>
-        </div>
-      </div>
-      <div class="examples" role="group" aria-label="Example roles">
-        <span class="hint">Try an example:</span>
-        <button type="button" class="chip-btn" data-example="maintenance">Maintenance Technician</button>
-        <button type="button" class="chip-btn" data-example="plc">SPS-Programmierer (DE)</button>
-        <button type="button" class="chip-btn" data-example="quality">Supplier Quality Engineer</button>
-        <button type="button" class="chip-btn" data-example="logistics">Logistics Associate</button>
-        <button type="button" class="chip-btn" data-example="data">Production Data Analyst</button>
-      </div>
-    </form>
-
     <div id="results" hidden>
-      <div class="role-bar card">
-        <div>
-          <p class="eyebrow" id="role-family">Role</p>
-          <h2 id="role-title">Role</h2>
+      <div class="role-head">
+        <div class="role-id">
+          <p class="role-family" id="role-family"></p>
+          <h2 id="role-title" tabindex="-1">Role</h2>
           <p class="hint" id="role-meta"></p>
         </div>
-        <div class="role-langs" role="group" aria-label="Profile languages to search">
-          <span class="label small">Search profiles written in</span>
-          <div class="seg" id="langs">
-            <label><input type="checkbox" value="en" checked> English</label>
-            <label><input type="checkbox" value="de" checked> German</label>
-            <label><input type="checkbox" value="pl"> Polish</label>
-          </div>
+        <div class="role-actions">
+          <button type="button" class="btn" id="edit-jd" aria-controls="intro">Edit job description</button>
+          <button type="button" class="btn" id="dl-brief">Download brief</button>
+          <button type="button" class="btn primary" id="dl-xlsx">Download Excel workbook</button>
+          <label class="inline small"><input type="checkbox" id="xl-examples" checked> Include fictional example rows, so the funnel dashboard shows numbers</label>
         </div>
       </div>
       <div id="warnings" class="warnings" role="status"></div>
 
       <div class="grid">
         <aside class="card terms" aria-labelledby="terms-h">
-          <h3 id="terms-h">Search terms</h3>
-          <p class="hint">Click to include or exclude. Hover or focus a skill to see the sentence it came from.</p>
-          <h4>Job titles</h4>
-          <div id="title-chips" class="chips"></div>
-          <div class="add-row">
-            <input id="add-title" type="text" maxlength="60" placeholder="Add a title" aria-label="Add a job title">
-            <select id="add-title-lang" aria-label="Title language"><option value="en">EN</option><option value="de">DE</option><option value="pl">PL</option></select>
-            <button type="button" class="btn small" id="add-title-btn">Add</button>
+          <div class="terms-head">
+            <h3 id="terms-h">Search terms</h3>
+            <span class="count" id="terms-count"></span>
           </div>
-          <h4>Must-have skills</h4>
-          <div id="must-chips" class="chips"></div>
-          <h4>Nice to have</h4>
-          <div id="nice-chips" class="chips"></div>
-          <div class="add-row">
-            <input id="add-skill" type="text" maxlength="60" placeholder="Add a skill or tool" aria-label="Add a skill">
-            <button type="button" class="btn small" id="add-skill-btn">Add</button>
+          <p class="hint">Terms with a tick are in the search. Tap one to take it out or put it back.</p>
+          <a class="jump" href="#tab-search">Skip to the searches</a>
+
+          <div class="group">
+            <h4>Job titles</h4>
+            <div class="lang-row">
+              <span class="hint" id="langs-label">Profiles written in</span>
+              <div class="seg small" id="langs" role="group" aria-labelledby="langs-label">
+                <label><input type="checkbox" value="en" checked> English</label>
+                <label><input type="checkbox" value="de" checked> German</label>
+                <label><input type="checkbox" value="pl"> Polish</label>
+              </div>
+            </div>
+            <div id="title-chips" class="chips"></div>
+            <button type="button" class="link-btn" id="titles-more" hidden></button>
+            <div class="add-row">
+              <input id="add-title" type="text" maxlength="60" placeholder="Add a job title" aria-label="Add a job title">
+              <select id="add-title-lang" aria-label="Language of the new title"><option value="en">EN</option><option value="de">DE</option><option value="pl">PL</option></select>
+              <button type="button" class="btn small" id="add-title-btn">Add</button>
+            </div>
           </div>
+
+          <div class="group">
+            <h4>Must-have skills</h4>
+            <div id="must-chips" class="chips"></div>
+            <h4>Nice to have</h4>
+            <div id="nice-chips" class="chips"></div>
+            <div class="add-row">
+              <input id="add-skill" type="text" maxlength="60" placeholder="Add a skill or tool" aria-label="Add a skill or tool">
+              <button type="button" class="btn small" id="add-skill-btn">Add</button>
+            </div>
+          </div>
+
+          <div id="evidence" class="evidence" aria-live="polite"></div>
+
           <details id="esco-box" class="more" hidden>
-            <summary>More from ESCO <span class="hint" id="esco-count"></span></summary>
-            <p class="hint">European skills taxonomy concepts that appear word-for-word in the text. Optional.</p>
+            <summary>More skills from ESCO <span class="hint" id="esco-count"></span></summary>
+            <p class="hint">Concepts from the European skills taxonomy that appear word for word in the text. None are added unless you pick them.</p>
             <div id="esco-chips" class="chips"></div>
           </details>
           <details class="more" id="context-box" hidden>
-            <summary>Context, not keywords</summary>
-            <p class="hint">Useful for the conversation or as filters, but they make weak search terms.</p>
+            <summary>Useful context, kept out of the search</summary>
+            <p class="hint">Good for the conversation or as filters, but weak as search terms.</p>
             <div id="context-list" class="context"></div>
           </details>
         </aside>
 
-        <section class="card work" aria-label="Outputs">
-          <div class="tabs" role="tablist">
-            <button role="tab" class="tab active" data-tab="search" aria-selected="true">Search pack</button>
-            <button role="tab" class="tab" data-tab="map" aria-selected="false">Talent map</button>
-            <button role="tab" class="tab" data-tab="outreach" aria-selected="false">Outreach</button>
-            <button role="tab" class="tab" data-tab="ai" aria-selected="false">AI assist</button>
-            <button role="tab" class="tab" data-tab="export" aria-selected="false">Export</button>
+        <section class="card work" aria-label="Results">
+          <div class="tabs" role="tablist" aria-label="Results">
+            <button role="tab" class="tab active" id="tab-search" data-tab="search" aria-selected="true" aria-controls="panel-search">Searches</button>
+            <button role="tab" class="tab" id="tab-map" data-tab="map" aria-selected="false" aria-controls="panel-map" tabindex="-1">Where to look</button>
+            <button role="tab" class="tab" id="tab-outreach" data-tab="outreach" aria-selected="false" aria-controls="panel-outreach" tabindex="-1">First message</button>
+            <button role="tab" class="tab" id="tab-ai" data-tab="ai" aria-selected="false" aria-controls="panel-ai" tabindex="-1">AI prompts</button>
           </div>
 
-          <!-- Search pack -->
-          <div class="panel" data-panel="search">
+          <!-- Searches -->
+          <div class="panel" id="panel-search" data-panel="search" role="tabpanel" aria-labelledby="tab-search">
             <div class="panel-head">
-              <div class="seg" id="strategy" role="radiogroup" aria-label="Search strategy">
+              <div class="seg" id="strategy" role="radiogroup" aria-label="How wide to search">
                 <label><input type="radio" name="strategy" value="narrow"> Narrow</label>
                 <label><input type="radio" name="strategy" value="balanced" checked> Balanced</label>
                 <label><input type="radio" name="strategy" value="broad"> Broad</label>
               </div>
               <p class="hint" id="strategy-help"></p>
             </div>
-            <div class="out" data-platform="recruiter">
-              <div class="out-head"><h4>LinkedIn Recruiter</h4><span class="hint">two fields</span></div>
-              <label class="label small" for="out-li-title">Job title field</label>
-              <div class="code-row"><textarea id="out-li-title" class="code" rows="2" spellcheck="false"></textarea><button type="button" class="btn small copy" data-copy="out-li-title">Copy</button></div>
+
+            <article class="out" data-platform="recruiter">
+              <header class="out-head"><h4>LinkedIn Recruiter</h4><span class="hint">Paste each part into the field of the same name.</span></header>
+              <div class="field-head"><label class="label small" for="out-li-title">Job title field</label><button type="button" class="btn small copy" data-copy="out-li-title">Copy</button></div>
+              <textarea id="out-li-title" class="code" rows="2" spellcheck="false"></textarea>
               <p class="check" data-for="out-li-title"></p>
-              <label class="label small" for="out-li-kw">Keywords field</label>
-              <div class="code-row"><textarea id="out-li-kw" class="code" rows="3" spellcheck="false"></textarea><button type="button" class="btn small copy" data-copy="out-li-kw">Copy</button></div>
+              <div class="field-head"><label class="label small" for="out-li-kw">Keywords field</label><button type="button" class="btn small copy" data-copy="out-li-kw">Copy</button></div>
+              <textarea id="out-li-kw" class="code" rows="3" spellcheck="false"></textarea>
               <p class="check" data-for="out-li-kw"></p>
               <div class="filters" id="li-filters"></div>
-            </div>
-            <div class="out" data-platform="xray">
-              <div class="out-head"><h4>Google X-ray</h4><a id="xray-open" class="link" href="#" target="_blank" rel="noopener noreferrer">Open in Google ↗</a></div>
-              <div class="code-row"><textarea id="out-xray" class="code" rows="3" spellcheck="false"></textarea><button type="button" class="btn small copy" data-copy="out-xray">Copy</button></div>
+            </article>
+
+            <article class="out" data-platform="xray">
+              <header class="out-head"><h4>Google X-ray</h4><span class="hint">Finds public LinkedIn profiles without a Recruiter seat.</span></header>
+              <div class="field-head"><a id="xray-open" class="link" href="#" target="_blank" rel="noopener noreferrer">Open in Google</a><button type="button" class="btn small copy" data-copy="out-xray">Copy</button></div>
+              <textarea id="out-xray" class="code" rows="3" spellcheck="false" aria-label="Google X-ray search"></textarea>
               <p class="check" data-for="out-xray"></p>
-            </div>
-            <div class="out" data-platform="generic">
-              <div class="out-head"><h4>XING, job boards, ATS search</h4><span class="hint">generic AND / OR / NOT</span></div>
-              <div class="code-row"><textarea id="out-generic" class="code" rows="3" spellcheck="false"></textarea><button type="button" class="btn small copy" data-copy="out-generic">Copy</button></div>
+            </article>
+
+            <article class="out" data-platform="generic">
+              <header class="out-head"><h4>XING, job boards and ATS</h4><span class="hint">Standard AND, OR, NOT.</span></header>
+              <div class="field-head"><label class="label small" for="out-generic">Search string</label><button type="button" class="btn small copy" data-copy="out-generic">Copy</button></div>
+              <textarea id="out-generic" class="code" rows="3" spellcheck="false"></textarea>
               <p class="check" data-for="out-generic"></p>
-            </div>
-            <p class="hint">Edits are checked as you type. Test every string on the target platform and read the first 25 results before scaling up.</p>
+            </article>
+            <p class="hint foot">You can edit any search; it is re-checked as you type. Run it on the platform and read the first 25 results before you scale up.</p>
           </div>
 
-          <!-- Talent map -->
-          <div class="panel" data-panel="map" hidden>
-            <p class="note">Editorial starting list for Berlin-Brandenburg (reviewed <span id="map-reviewed"></span>). It contains no headcounts or availability claims; add and remove entries to fit your role.</p>
-            <h4>Where to search</h4>
+          <!-- Where to look -->
+          <div class="panel" id="panel-map" data-panel="map" role="tabpanel" aria-labelledby="tab-map" hidden>
+            <p class="note">A starting list for Berlin-Brandenburg, reviewed <span id="map-reviewed"></span>. It makes no claims about headcount or availability, so adjust it to your role.</p>
+            <h4>Commute areas</h4>
             <div id="map-locations" class="locs"></div>
-            <h4>Adjacent employers <span class="hint">(target their people with company searches)</span></h4>
+            <h4>Employers with similar skills <span class="hint">Selected ones go into the company search below.</span></h4>
             <div id="map-employers" class="employers"></div>
             <div class="add-row">
               <input id="add-employer" type="text" maxlength="60" placeholder="Add an employer" aria-label="Add an employer">
               <button type="button" class="btn small" id="add-employer-btn">Add</button>
             </div>
-            <div class="out">
-              <div class="out-head"><h4>Company-targeted X-ray</h4><a id="cx-open" class="link" href="#" target="_blank" rel="noopener noreferrer">Open in Google ↗</a></div>
-              <div class="code-row"><textarea id="out-company-xray" class="code" rows="3" spellcheck="false"></textarea><button type="button" class="btn small copy" data-copy="out-company-xray">Copy</button></div>
+            <article class="out">
+              <header class="out-head"><h4>Company search</h4><span class="hint">People with these titles at the selected employers.</span></header>
+              <div class="field-head"><a id="cx-open" class="link" href="#" target="_blank" rel="noopener noreferrer">Open in Google</a><button type="button" class="btn small copy" data-copy="out-company-xray">Copy</button></div>
+              <textarea id="out-company-xray" class="code" rows="3" spellcheck="false" aria-label="Company-targeted Google X-ray search"></textarea>
               <p class="check" data-for="out-company-xray"></p>
-              <label class="label small" for="out-company-list">LinkedIn Recruiter "Companies" filter</label>
-              <div class="code-row"><textarea id="out-company-list" class="code" rows="3" spellcheck="false" readonly></textarea><button type="button" class="btn small copy" data-copy="out-company-list">Copy</button></div>
-            </div>
+              <div class="field-head"><label class="label small" for="out-company-list">For the "Companies" filter in LinkedIn Recruiter</label><button type="button" class="btn small copy" data-copy="out-company-list">Copy</button></div>
+              <textarea id="out-company-list" class="code" rows="3" spellcheck="false" readonly></textarea>
+            </article>
             <div class="two">
               <div><h4>Schools and training</h4><ul id="map-schools" class="plain"></ul></div>
               <div><h4>Channels beyond LinkedIn</h4><ul id="map-channels" class="plain"></ul></div>
             </div>
           </div>
 
-          <!-- Outreach -->
-          <div class="panel" data-panel="outreach" hidden>
+          <!-- First message -->
+          <div class="panel" id="panel-outreach" data-panel="outreach" role="tabpanel" aria-labelledby="tab-outreach" hidden>
             <div class="panel-head">
               <div class="seg" id="out-lang" role="radiogroup" aria-label="Message language">
                 <label><input type="radio" name="olang" value="en" checked> English</label>
@@ -197,55 +228,39 @@
                 <label class="label small" for="msg-body">Message</label>
                 <textarea id="msg-body" rows="13"></textarea>
                 <div class="btn-row">
-                  <button type="button" class="btn small copy" data-copy="msg-body">Copy message</button>
-                  <button type="button" class="btn small ghost" id="msg-reset">Reset draft</button>
-                  <button type="button" class="btn small ai-only" id="msg-ai" disabled>Improve with AI</button>
+                  <button type="button" class="btn small primary copy" data-copy="msg-body">Copy message</button>
+                  <button type="button" class="btn small ghost" id="msg-reset">Start again</button>
+                  <button type="button" class="btn small ai-only" id="msg-ai" disabled title="Add an API key in the AI prompts tab to use this">Improve with AI</button>
                 </div>
-                <p class="hint">Fill every [bracket] yourself: ScoutForge never invents facts about the employer or the candidate. Nothing is sent.</p>
+                <p class="hint">Fill in every [bracket] yourself. ScoutForge never invents facts about the employer or the candidate, and it sends nothing.</p>
               </div>
               <div class="quality" aria-live="polite">
-                <div class="score"><span id="msg-score">0</span><small>/100</small></div>
                 <p class="label small">Candidate-experience check</p>
+                <div class="score" id="msg-score-box"><span id="msg-score">0</span><small>/100</small></div>
                 <ul id="msg-checks" class="checks"></ul>
               </div>
             </div>
           </div>
 
-          <!-- AI assist -->
-          <div class="panel" data-panel="ai" hidden>
-            <h4>Prompt library for this role</h4>
-            <p class="hint">Copy into an approved AI platform. Each prompt includes inputs, output format and guardrails (no protected attributes, no invented facts, no scoring of people).</p>
+          <!-- AI prompts -->
+          <div class="panel" id="panel-ai" data-panel="ai" role="tabpanel" aria-labelledby="tab-ai" hidden>
+            <p class="hint">Ready-made prompts for this role. Copy one into the AI tool your company has approved. Each one states its inputs, the output format and the guardrails: no protected attributes, no invented facts, no scoring of people.</p>
             <div id="prompt-list" class="prompts"></div>
-            <div class="btn-row"><button type="button" class="btn small" id="dl-prompts">Download prompt library (.md)</button></div>
-            <hr>
-            <h4>Optional: run suggestions with your own key</h4>
-            <p class="hint">The key stays in this tab's memory and is sent only to the endpoint below. Suggestions are validated and must be approved before they reach a search. Don't paste personal data.</p>
-            <div class="ai-settings">
-              <div class="field"><label class="label small" for="ai-provider">Provider</label>
-                <select id="ai-provider"><option value="anthropic">Anthropic (Claude)</option><option value="openai">OpenAI-compatible (internal gateway, Azure proxy, Ollama…)</option></select></div>
-              <div class="field"><label class="label small" for="ai-base">Endpoint</label><input id="ai-base" type="url" placeholder="https://api.anthropic.com"></div>
-              <div class="field"><label class="label small" for="ai-model">Model</label><input id="ai-model" type="text" placeholder="model name"></div>
-              <div class="field"><label class="label small" for="ai-key">API key</label><input id="ai-key" type="password" autocomplete="off" placeholder="kept in memory only"></div>
-            </div>
-            <div class="btn-row"><button type="button" class="btn small primary" id="ai-suggest" disabled>Suggest titles and synonyms</button><span id="ai-status" class="hint" role="status"></span></div>
-            <div id="ai-results"></div>
-          </div>
+            <div class="btn-row"><button type="button" class="btn small" id="dl-prompts">Download all prompts (.md)</button></div>
 
-          <!-- Export -->
-          <div class="panel" data-panel="export" hidden>
-            <div class="export">
-              <div class="export-card">
-                <h4>Excel sourcing workbook</h4>
-                <p>Search pack, a pipeline tracker with dropdowns, a <strong>funnel and channel dashboard built on live formulas</strong>, an automation-impact calculator and the prompt library.</p>
-                <label class="inline"><input type="checkbox" id="xl-examples" checked> Include fictional example rows so the dashboard shows numbers</label>
-                <button type="button" class="btn primary" id="dl-xlsx">Download .xlsx</button>
+            <details class="more byok" id="byok">
+              <summary>Get suggestions with your own API key <span class="hint">optional</span></summary>
+              <p class="hint">The key stays in this tab's memory and goes only to the endpoint you enter. You approve each suggestion before it reaches a search. Don't paste personal data.</p>
+              <div class="ai-settings">
+                <div class="field"><label class="label small" for="ai-provider">Provider</label>
+                  <select id="ai-provider"><option value="anthropic">Anthropic (Claude)</option><option value="openai">OpenAI-compatible (gateway, Azure proxy, Ollama)</option></select></div>
+                <div class="field"><label class="label small" for="ai-base">Endpoint</label><input id="ai-base" type="url" placeholder="https://api.anthropic.com"></div>
+                <div class="field"><label class="label small" for="ai-model">Model</label><input id="ai-model" type="text" placeholder="model name"></div>
+                <div class="field"><label class="label small" for="ai-key">API key</label><input id="ai-key" type="password" autocomplete="off" placeholder="kept in memory only"></div>
               </div>
-              <div class="export-card">
-                <h4>Sourcing brief</h4>
-                <p>One Markdown page with the strings, filters, talent map and outreach draft, to share with the hiring manager.</p>
-                <button type="button" class="btn" id="dl-brief">Download .md</button>
-              </div>
-            </div>
+              <div class="btn-row"><button type="button" class="btn small primary" id="ai-suggest" disabled>Suggest titles and synonyms</button><span id="ai-status" class="hint" role="status"></span></div>
+              <div id="ai-results"></div>
+            </details>
           </div>
         </section>
       </div>
@@ -253,13 +268,12 @@
   </div>
 </section>
 
-<!-- ================================================================ BATCH -->
+<!-- ================================================================ MANY ROLES -->
 <section id="view-batch" class="view" data-view="batch" hidden>
   <div class="wrap">
-    <div class="hero small">
-      <p class="eyebrow">High-volume sourcing</p>
-      <h1>Several open roles at once.</h1>
-      <p class="lede">Paste job descriptions separated by a line containing only <code>---</code>. ScoutForge builds a search pack for each role and one workbook that tracks them all.</p>
+    <div class="page-head">
+      <h1>Build searches for several roles at once.</h1>
+      <p class="lede">Paste the job descriptions with a line containing only <code>---</code> between them. You get a search pack for each role and one workbook that tracks them all.</p>
     </div>
     <div class="card">
       <label for="batch-input" class="label">Job descriptions</label>
@@ -267,17 +281,21 @@
       <div class="btn-row">
         <button type="button" class="btn primary" id="batch-run">Build all search packs</button>
         <button type="button" class="btn ghost" id="batch-example">Load 4 example roles</button>
-        <span class="seg small" id="batch-langs"><label><input type="checkbox" value="en" checked> EN</label><label><input type="checkbox" value="de" checked> DE</label><label><input type="checkbox" value="pl"> PL</label></span>
+        <span class="lang-row"><span class="hint" id="batch-langs-label">Profiles written in</span>
+          <span class="seg small" id="batch-langs" role="group" aria-labelledby="batch-langs-label"><label><input type="checkbox" value="en" checked> EN</label><label><input type="checkbox" value="de" checked> DE</label><label><input type="checkbox" value="pl"> PL</label></span></span>
       </div>
     </div>
     <div id="batch-results" hidden>
-      <div class="table-wrap card">
+      <div class="results-bar">
+        <p id="batch-summary" class="hint"></p>
+        <button type="button" class="btn primary" id="batch-xlsx">Download one workbook for all roles</button>
+      </div>
+      <div class="table-wrap card flush">
         <table class="table" id="batch-table">
-          <thead><tr><th>Role</th><th>Must-have skills</th><th>LinkedIn Recruiter keywords (balanced)</th><th>Google X-ray</th></tr></thead>
+          <thead><tr><th>Role</th><th>Must-have skills</th><th>LinkedIn Recruiter keywords</th><th>Google X-ray</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
-      <div class="btn-row"><button type="button" class="btn primary" id="batch-xlsx">Download one workbook for all roles</button></div>
     </div>
   </div>
 </section>
@@ -285,66 +303,64 @@
 <!-- ================================================================ ATS -->
 <section id="view-ats" class="view" data-view="ats" hidden>
   <div class="wrap">
-    <div class="hero small">
-      <p class="eyebrow">Data quality</p>
+    <div class="page-head">
       <h1>Clean an ATS export before the weekly report.</h1>
-      <p class="lede">Finds duplicates, missing owners, non-standard stages and sources, broken emails, mixed date formats and stale records. Values are normalised; duplicates are flagged, never deleted. The file never leaves your browser.</p>
+      <p class="lede">Finds duplicates, missing owners, non-standard stages and sources, broken emails, mixed date formats and stale records. Values are standardised and duplicates are flagged, never deleted. The file stays in your browser.</p>
     </div>
     <div class="card">
-      <div class="btn-row">
-        <label class="btn" for="ats-file">Choose CSV file</label>
+      <div class="btn-row first">
+        <label class="btn primary" for="ats-file">Choose a CSV file</label>
         <input id="ats-file" type="file" accept=".csv,text/csv" class="visually-hidden">
-        <button type="button" class="btn ghost" id="ats-sample">Use fictional sample export</button>
-        <span class="hint">Expected columns (any order, common names recognised): candidate_id, name, email, phone, role, source, stage, owner, last_activity</span>
+        <button type="button" class="btn" id="ats-sample">Try a fictional sample</button>
       </div>
+      <p class="hint">Columns can be in any order, and common names are recognised: candidate_id, name, email, phone, role, source, stage, owner, last_activity.</p>
     </div>
     <div id="ats-results" hidden>
       <div class="ats-summary">
-        <div class="card stat"><span class="stat-n" id="ats-health">–</span><span class="stat-l">records without issues</span></div>
+        <div class="card stat"><span class="stat-n" id="ats-health">–</span><span class="stat-l">of records have no issues</span></div>
         <div class="card stat"><span class="stat-n" id="ats-rows">–</span><span class="stat-l">records checked</span></div>
         <div class="card stat"><span class="stat-n" id="ats-issues">–</span><span class="stat-l">issues found</span></div>
-        <div class="card stat-actions"><button type="button" class="btn primary" id="ats-download">Download cleaned CSV</button><p class="hint">Adds a <code>dq_flag</code> column; formula-like values are escaped.</p></div>
+        <div class="card stat-actions"><button type="button" class="btn primary" id="ats-download">Download cleaned CSV</button><p class="hint">Adds a <code>dq_flag</code> column and escapes values that look like spreadsheet formulas.</p></div>
       </div>
       <div class="card"><h3>Issues by type</h3><ul id="ats-types" class="bars"></ul></div>
-      <div class="card table-wrap"><table class="table" id="ats-table"><thead><tr><th>Row</th><th>Field</th><th>Problem</th><th>Suggested fix</th></tr></thead><tbody></tbody></table></div>
+      <div class="card table-wrap flush"><table class="table" id="ats-table"><thead><tr><th>Row</th><th>Field</th><th>Problem</th><th>Suggested fix</th></tr></thead><tbody></tbody></table></div>
     </div>
   </div>
 </section>
 
-<!-- ================================================================ METHOD -->
+<!-- ================================================================ HOW IT WORKS -->
 <section id="view-method" class="view" data-view="method" hidden>
   <div class="wrap narrow">
-    <div class="hero small">
-      <p class="eyebrow">Method &amp; quality</p>
-      <h1>How ScoutForge decides, and how well it works.</h1>
+    <div class="page-head">
+      <h1>How ScoutForge picks its terms, and how well it does.</h1>
     </div>
     <div class="card">
-      <h3>Benchmark: term extraction, v0.4 vs v1.0</h3>
+      <h3>Benchmark: term extraction, v0.4 against v1.0</h3>
       <p id="eval-note" class="hint"></p>
       <div class="eval-summary" id="eval-summary"></div>
-      <details class="more"><summary>Per role</summary><div class="table-wrap"><table class="table" id="eval-table"><thead><tr><th>Role</th><th>Precision</th><th>Must-have recall</th><th>Junk in suggestions</th></tr></thead><tbody></tbody></table></div></details>
-      <p class="hint">Reproduce with <code>node eval/run.mjs</code>. The test set and labels are in <code>eval/roles.json</code>.</p>
+      <details class="more"><summary>Results per role</summary><div class="table-wrap"><table class="table" id="eval-table"><thead><tr><th>Role</th><th>Precision</th><th>Must-have recall</th><th>Junk in suggestions</th></tr></thead><tbody></tbody></table></div></details>
+      <p class="hint">Reproduce it with <code>node eval/run.mjs</code>. The test set and its labels are in <code>eval/roles.json</code>.</p>
     </div>
     <div class="card prose">
-      <h3>Pipeline</h3>
+      <h3>From text to search</h3>
       <ol class="steps">
-        <li><strong>Evidence.</strong> The text is split into sentences and sections ("Requirements", "Nice to have", "Ihr Profil"…). A skill counts only if a phrase from the curated vocabulary appears word-for-word; short acronyms such as SAP or ATS must match in capitals.</li>
-        <li><strong>Priority.</strong> Wording such as "is a plus", "preferred" or "von Vorteil" marks nice-to-haves. Specific tools rank above broad domains; working conditions (shift work, industry) are kept as context, not keywords.</li>
-        <li><strong>Vocabulary.</strong> Each skill and job family has the terms people actually write on profiles in English, German (both gendered forms, because LinkedIn has no wildcards) and Polish.</li>
-        <li><strong>Strings.</strong> Synonyms are grouped by category: OR inside a group, AND between groups. Each platform gets its own syntax; X-ray strings are trimmed to Google's word budget, and every string is parsed and validated.</li>
-        <li><strong>Human in the loop.</strong> Optional ESCO concepts and AI suggestions are never added automatically.</li>
+        <li><strong>Evidence.</strong> The text is split into sentences and sections ("Requirements", "Nice to have", "Ihr Profil"…). A skill counts only if a phrase from the curated vocabulary appears word for word. Short acronyms such as SAP or ATS must match in capitals.</li>
+        <li><strong>Priority.</strong> Wording such as "is a plus", "preferred" or "von Vorteil" marks nice-to-haves. Specific tools rank above broad domains. Working conditions, such as shift work, are kept as context rather than keywords.</li>
+        <li><strong>Vocabulary.</strong> Each skill and job family carries the terms people actually write on profiles in English, German (both gendered forms, because LinkedIn has no wildcards) and Polish.</li>
+        <li><strong>Searches.</strong> Synonyms are grouped by category: OR inside a group, AND between groups. Each platform gets its own syntax. X-ray searches are trimmed to Google's word limit, and every search is parsed and checked.</li>
+        <li><strong>You decide.</strong> ESCO concepts and AI suggestions are never added automatically.</li>
       </ol>
       <h3>Privacy</h3>
-      <p>Everything runs in your browser. Job descriptions, ATS files and drafts are not uploaded or stored. Fonts are self-hosted. The optional AI step sends the role summary only to the endpoint you configure, with your key.</p>
+      <p>Everything runs in your browser. Job descriptions, ATS files and drafts are not uploaded or stored, and the fonts are self-hosted. The optional AI step sends the role summary only to the endpoint you configure, with your key.</p>
       <h3>Limitations</h3>
       <ul>
-        <li>The vocabulary is hand-curated (version <span id="vocab-version"></span>); unknown tools are not guessed. Add them as terms.</li>
-        <li>The talent map is an editorial seed list for Berlin-Brandenburg, not market data.</li>
-        <li>Platforms change their search syntax; always test strings on the target platform.</li>
+        <li>The vocabulary is curated by hand (version <span id="vocab-version"></span>), so unknown tools are not guessed. Add them as terms.</li>
+        <li>The talent map is an editorial starting list for Berlin-Brandenburg, not market data.</li>
+        <li>Platforms change their search syntax, so always test a search on the platform itself.</li>
         <li>The benchmark measures term extraction on authored job descriptions, not search results or hiring outcomes.</li>
       </ul>
       <h3>Data sources</h3>
-      <p>ESCO v1.2.0 skills, <a href="https://esco.ec.europa.eu/en/use-esco/download" target="_blank" rel="noopener noreferrer">European Commission</a>, used for optional multi-word concept matches. Everything else is ScoutForge's own editorial vocabulary.</p>
+      <p>ESCO v1.2.0 skills from the <a href="https://esco.ec.europa.eu/en/use-esco/download" target="_blank" rel="noopener noreferrer">European Commission</a>, used for optional multi-word concept matches. Everything else is ScoutForge's own editorial vocabulary.</p>
     </div>
   </div>
 </section>
@@ -352,8 +368,8 @@
 
 <footer class="footer">
   <div class="wrap footer-inner">
-    <p><strong>ScoutForge</strong> is an independent open-source project, not affiliated with Tesla, LinkedIn, XING or Google. It runs in your browser and does not contact candidates.</p>
-    <p class="hint"><a href="https://github.com/abrar0205/ScoutForge" target="_blank" rel="noopener noreferrer">Source on GitHub</a> · MIT licence · fonts under OFL</p>
+    <p>ScoutForge is an independent open-source project, not affiliated with Tesla, LinkedIn, XING or Google. It runs in your browser and never contacts candidates.</p>
+    <p class="hint"><a href="https://github.com/abrar0205/ScoutForge" target="_blank" rel="noopener noreferrer">Source on GitHub</a>. MIT licence; fonts under the SIL Open Font License.</p>
   </div>
 </footer>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>

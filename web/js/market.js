@@ -12,7 +12,7 @@ export const MARKET_REVIEWED = '2026-11';
 export const LOCATION_TIERS = [
   { id: 'core', label: 'Core commute (≈ up to 45 min)', places: ['Berlin', 'Grünheide', 'Erkner', 'Fürstenwalde', 'Strausberg', 'Königs Wusterhausen'] },
   { id: 'regional', label: 'Regional (≈ 45–90 min)', places: ['Frankfurt (Oder)', 'Eberswalde', 'Potsdam', 'Cottbus', 'Brandenburg'] },
-  { id: 'cross-border', label: 'Cross-border Poland', places: ['Słubice', 'Gorzów Wielkopolski', 'Szczecin', 'Poznań'], note: 'Polish profiles: switch on Polish titles.' },
+  { id: 'cross-border', label: 'Cross-border Poland', places: ['Słubice', 'Gorzów Wielkopolski', 'Szczecin', 'Poznań'], note: 'Turning this on adds Polish job titles.' },
 ];
 
 /** Which employer and school lists fit a job family. */
