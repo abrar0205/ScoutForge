@@ -1,8 +1,11 @@
 {
-  "name":"scoutforge",
-  "version":"0.2.0",
-  "private":true,
-  "type":"module",
-  "description":"Evidence-led AI sourcing strategy workbench",
-  "scripts":{"test":"node --test tests/*.test.js", "check":"node --check web/engine.js && node --check web/app.js"}
+  "name": "scoutforge",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Evidence-linked recruiter sourcing workbench with native Excel exports",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node --check web/engine.js && node --check web/app.js && node --check web/xlsx.js"
+  }
 }
