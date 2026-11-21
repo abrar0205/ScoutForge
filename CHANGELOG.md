@@ -1,16 +1,15 @@
-# Release history
+# ScoutForge release notes
 
-## v0.2 — Focused recruiter workflow
+## v0.3 — Search that actually works for humans
 
-- Condensed the public application into three stages: **Define role → Build search → Export plan**.
-- Source evidence and related-occupation graph are expandable instead of occupying the primary screen.
-- Added simple verb-variant extraction for multiword ESCO labels and explicit review of suggested requirements.
-- Replaced three simultaneous Boolean panels with one editor and three selectable strategies.
-- Added a deterministic Boolean AST parser (AND/OR/NOT/parentheses), syntax feedback and taxonomy-only coverage checks.
-- Added a human-reviewed outreach template and cleaner sourcing brief plus CSV exports.
-- Expanded unit tests and real-ESM desktop/mobile browser regression coverage in CI.
-- No candidate personal data, scraping, automatic outreach, fabricated recruiting metrics or unverified AI claims.
+- Fixed the reported case where entering only `python` produced zero suggestions and an unusable path through the workbench. Exact mention of Python (with job title present or absent) is accepted as a reviewable JD keyword.
+- Added a transparent, inspectable glossary alongside ESCO, with distinct ESCO / JD keyword / recruiter-added provenance; no invented taxonomy relationships.
+- Rebuilt the UI as a single prominent input and immediately usable search pane. Removed the mandatory multi-tab wizard, empty analysis column and large decorative hero.
+- Search strategy tabs include Balanced, Focused and Broad. Users can edit, validate, copy and reset each Boolean query, remove or add search terms and use optional suggestions from the loaded ESCO vocabulary.
+- Added a real offline-generated XLSX workbook with Overview, Searches, Terms and empty Activity tracker, plus existing Markdown brief.
+- Moved detailed evidence, related-occupation graph and outreach draft into optional sections. Added a stale-state guard when the source JD changes before regeneration.
+- Expanded deterministic unit tests, syntax tests, Excel ZIP/XML verification and desktop/mobile browser QA.
 
-## v0.1 — First working prototype
+## v0.2 — Compact initial workbench
 
-- Published an ESCO-backed sourcing workbench, query compiler and strategy dossier through GitHub Pages.
+- Three-stage sourcing workflow; initial ESCO evidence extraction, source-linked terms, Boolean validation, CSV and Markdown exports.

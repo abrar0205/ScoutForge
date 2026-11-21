@@ -24,6 +24,7 @@ jobs:
         run: |
           node --check web/app.js
           node --check web/engine.js
+          node --check web/xlsx.js
       - name: Validate published source data when available
         run: |
           if [ -f web/data/esco.json ]; then python -c "import json;d=json.load(open('web/data/esco.json'));assert d['counts']['occupations']>50"; fi

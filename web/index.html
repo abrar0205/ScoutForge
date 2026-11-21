@@ -2,130 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="theme-color" content="#0a1216"/>
-  <meta name="description" content="ScoutForge turns a job description into a transparent sourcing strategy. Real ESCO skills, editable Boolean searches, and a recruiter-ready export."/>
-  <meta property="og:title" content="ScoutForge — Search with evidence"/>
-  <meta property="og:description" content="A compact, practical sourcing-strategy workbench backed by real European occupation data."/>
-  <title>ScoutForge — Sourcing Strategy Workbench</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#101626"/>
+  <meta name="description" content="ScoutForge builds clear, editable sourcing strategies from job descriptions. Explore verified ESCO links, review search terms and export a recruiter-ready plan."/>
+  <meta property="og:title" content="ScoutForge — Better sourcing, less busywork"/>
+  <title>ScoutForge — Your sourcing workbench</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="styles.css"/>
   <script type="module" src="app.js"></script>
 </head>
 <body>
-<a class="skip" href="#workbench">Skip to workbench</a>
-<header class="topbar">
-  <a class="brand" href="#top" aria-label="ScoutForge home"><span class="brand-mark" aria-hidden="true">S<span>✳</span></span><span>scoutforge<span class="brand-dot">.</span></span></a>
-  <nav aria-label="Site navigation"><a href="#workbench">Workbench</a><a href="#about">About the data</a><a href="https://github.com/abrar0205/ScoutForge" target="_blank" rel="noopener noreferrer" aria-label="ScoutForge source code on GitHub">GitHub ↗</a></nav>
-</header>
-<main id="top">
-  <section class="intro container" aria-labelledby="intro-title">
-    <div class="intro-main"><p class="eyebrow"><span class="pulse"></span> RECRUITING INTELLIGENCE / PUBLIC LAB</p>
-      <h1 id="intro-title">A better search<br/><em>starts with the role.</em></h1>
-      <p class="intro-text">Turn a job description into a clear, evidence-backed sourcing plan. No candidate scraping. No guesswork disguised as data.</p>
-      <a class="jump" href="#workbench">Open workbench <span aria-hidden="true">↘</span></a>
-    </div>
-    <div class="intro-art" aria-hidden="true">
-      <svg viewBox="0 0 480 290" role="img" focusable="false">
-        <defs><radialGradient id="glow"><stop stop-color="#79d7bd" stop-opacity=".15"/><stop offset="1" stop-color="#79d7bd" stop-opacity="0"/></radialGradient></defs>
-        <circle cx="254" cy="145" r="144" fill="url(#glow)"/>
-        <g stroke="#82d9c0" stroke-width="1.2" opacity=".43"><path d="M238 142 110 65 84 194 238 142 385 78 422 197 288 241 238 142 171 258 84 194"/><path d="M110 65 385 78M171 258 422 197" stroke-dasharray="3 7"/></g>
-        <g fill="#19292c" stroke="#7dcfb4" stroke-width="1.7"><circle cx="110" cy="65" r="13"/><circle cx="84" cy="194" r="11"/><circle cx="385" cy="78" r="13"/><circle cx="422" cy="197" r="11"/><circle cx="171" cy="258" r="11"/><circle cx="288" cy="241" r="12"/></g>
-        <circle cx="238" cy="142" r="35" fill="#a5f4bc"/><circle cx="238" cy="142" r="46" stroke="#a5f4bc" stroke-opacity=".42" fill="none"/>
-        <text x="238" y="147" fill="#11251d" font-size="13" font-family="DM Mono, monospace" text-anchor="middle" font-weight="bold">ROLE</text>
-        <g fill="#cbded6" font-size="10" font-family="DM Mono, monospace"><text x="35" y="40">TITLE</text><text x="30" y="227">SKILLS</text><text x="366" y="43">ADJACENCY</text><text x="380" y="226">SEARCH</text><text x="150" y="283">EVIDENCE</text></g>
-      </svg>
-      <div class="art-caption"><span>01 / READ</span><span>02 / EXPLORE</span><span>03 / EXPORT</span></div>
-    </div>
-  </section>
+  <a class="skip" href="#main">Skip to workbench</a>
+  <header class="topbar">
+    <a class="brand" href="#main" aria-label="ScoutForge home"><span class="brand-symbol" aria-hidden="true">✳</span><span>scoutforge<span class="brand-period">.</span></span></a>
+    <div class="topbar-right"><span class="top-label">SOURCING WORKBENCH <span class="beta">BETA</span></span><a class="repo-link" href="https://github.com/abrar0205/ScoutForge" rel="noopener noreferrer" target="_blank">GitHub <span aria-hidden="true">↗</span></a></div>
+  </header>
 
-  <section class="workbench container" id="workbench" aria-labelledby="workbench-title">
-    <div class="workspace-bar"><div><p class="eyebrow">YOUR WORKSPACE</p><h2 id="workbench-title">Build a sourcing plan</h2></div><div id="data-status" class="data-status"><span class="pulse"></span><span>Loading ESCO data…</span></div></div>
-    <div class="step-nav" role="tablist" aria-label="Sourcing workflow">
-      <button type="button" class="workflow-tab active" role="tab" aria-selected="true" aria-controls="panel-intake" data-stage="intake"><span>01</span> Define role</button>
-      <button type="button" class="workflow-tab" role="tab" aria-selected="false" aria-controls="panel-twin" data-stage="twin"><span>02</span> Build search</button>
-      <button type="button" class="workflow-tab" role="tab" aria-selected="false" aria-controls="panel-dossier" data-stage="dossier"><span>03</span> Export plan</button>
+  <main id="main" class="container">
+    <div class="hero">
+      <p class="eyebrow"><span class="eyebrow-line"></span> THE RECRUITER'S SEARCH STUDIO</p>
+      <h1>Better searches.<br/><span>Less busywork.</span></h1>
+      <p>Paste a job description—or start with a skill. Get an editable search strategy in one step.</p>
     </div>
 
-    <section class="stage" role="tabpanel" id="panel-intake" aria-label="Define role">
-      <div class="two-column">
-        <div class="work-panel form-panel">
-          <div class="panel-heading"><div><span class="overline">STEP 01</span><h3>What role are you sourcing?</h3></div><p>Paste a job description, then review the skills we found in the text.</p></div>
-          <label for="role-title">Job title <span>Optional</span></label>
-          <input id="role-title" type="text" maxlength="100" placeholder="e.g. Industrial Automation Engineer" autocomplete="off"/>
-          <label for="job-description">Job description</label>
-          <textarea id="job-description" rows="10" maxlength="25000" placeholder="Paste the role description here…" spellcheck="true"></textarea>
-          <div class="input-meta"><span id="word-count">0 words</span><span>Processed on your device</span></div>
-          <div class="button-row"><button type="button" id="analyze" class="button primary">Analyze role <span aria-hidden="true">↗</span></button><button type="button" class="button subtle" id="example">Try example</button><button type="button" class="text-action" id="clear">Clear</button></div>
-        </div>
-        <div class="work-panel review-panel">
-          <div class="panel-heading"><div><span class="overline" id="analysis-mode">RULE-BASED / SOURCE LINKED</span><h3>Review your skills</h3></div><p>Only explicitly matched terms are listed. You decide which ones belong in your search.</p></div>
-          <div class="blank-state" id="intake-empty"><span class="blank-glyph" aria-hidden="true">✳</span><strong>Ready when you are.</strong><p>Paste a role or try the example to see source-linked skill suggestions.</p></div>
-          <div id="intake-results" hidden>
-            <div class="results-summary"><strong id="results-title">Untitled role</strong><span id="match-count" class="count-chip">0 matches</span></div>
-            <p id="results-note" class="note">Matches are suggestions. Review each one.</p>
-            <div class="review-actions"><button type="button" id="select-all">Select all</button><button type="button" id="deselect-all">None</button></div>
-            <div id="requirements-list" class="requirements-list"></div>
-            <button type="button" id="show-more-skills" class="show-more" hidden>Show more matches ↓</button>
-            <label for="manual-skills" class="manual-label">Other useful terms <span>Optional</span></label>
-            <input id="manual-skills" type="text" placeholder="e.g. PLC, SCADA, TIA Portal (comma separated)"/>
-            <small class="muted-text">Your terms are kept separate from verified ESCO matches.</small>
-            <button class="button primary full next-step" type="button" data-goto="twin">Build sourcing searches <span aria-hidden="true">→</span></button>
-          </div>
-        </div>
-      </div>
+    <section id="intake" class="intake card" aria-label="Role input">
+      <div class="card-head"><div><span class="step">01 / START HERE</span><h2>What are you hiring for?</h2></div><span id="data-status" class="status" role="status"><span class="status-dot"></span><span>Loading skills library</span></span></div>
+      <label class="field-label" for="job-description">Job description or skill</label>
+      <textarea id="job-description" rows="6" maxlength="25000" placeholder="Paste a job description here…\n\nOr simply type Python, PLC, SQL, recruiting, etc." spellcheck="true" aria-describedby="input-hint"></textarea>
+      <div class="field-help" id="input-hint"><span>Short inputs work too · Ctrl/⌘ + Enter to generate</span><span id="word-count">0 words</span></div>
+      <details class="optional-input"><summary>+ Add a job title <span>(optional)</span></summary><label for="role-title" class="sr-only">Job title</label><input id="role-title" maxlength="100" placeholder="e.g. Industrial Automation Engineer" autocomplete="off"/></details>
+      <div class="form-actions"><button type="button" id="analyze" class="button primary">Generate sourcing plan <span aria-hidden="true">↗</span></button><button type="button" id="example" class="button soft">Try sample role</button><button type="button" id="clear" class="quiet">Clear</button></div>
+      <p class="privacy-line"><span aria-hidden="true">◈</span> Private by design: your input stays in this browser. No candidate data is collected.</p>
     </section>
 
-    <section class="stage" role="tabpanel" id="panel-twin" aria-label="Build search" hidden>
-      <div class="two-column">
-        <div class="work-panel query-panel">
-          <div class="panel-heading"><div><span class="overline">STEP 02 / SEARCHTWIN</span><h3>Choose a search approach</h3></div><p>Compare search structures; no candidate database is searched.</p></div>
-          <div id="strategy-picks" class="strategy-picks" role="group" aria-label="Select sourcing approach"></div>
-          <div class="query-label-row"><label for="query-input">Boolean search</label><span id="strategy-count" class="mono-muted"></span></div>
-          <textarea id="query-input" rows="8" spellcheck="false" aria-describedby="query-validation"></textarea>
-          <p id="query-validation" class="query-feedback" role="status">Enter a role first.</p>
-          <div id="search-diagnostics" class="diagnostics"></div>
-          <div class="button-row"><button type="button" id="copy-query" class="button primary">Copy search <span aria-hidden="true">↗</span></button><button type="button" class="button subtle" id="reset-query">Reset query</button></div>
-        </div>
-        <div class="work-panel explain-panel">
-          <div class="panel-heading"><div><span class="overline">WHY THIS SEARCH?</span><h3>See your search logic</h3></div><p id="twin-interpretation">Choose a strategy to inspect its structure and coverage.</p></div>
-          <div class="evidence-board"><div class="evidence-row"><span>Title alternatives</span><strong id="metric-titles">0</strong></div><div class="evidence-row"><span>Selected skill terms</span><strong id="metric-skills">0</strong></div><div class="evidence-row"><span>Taxonomy matches</span><strong id="metric-coverage">—</strong></div></div>
-          <p class="fine-print">Taxonomy matches are ESCO occupation descriptions satisfying the query, <strong>not candidate counts or live talent availability</strong>.</p>
-          <details id="related-details" class="related-details">
-            <summary>Explore related occupations <span aria-hidden="true">↗</span></summary>
-            <div class="related-inner"><p id="atlas-version" class="mono-muted">ESCO data loading…</p><label for="atlas-search">Filter by occupation</label><input id="atlas-search" type="search" placeholder="Filter related roles…"/><div id="graph" class="atlas-graph" role="img" aria-label="ESCO skill-to-occupation connections"></div><div id="occupation-list" class="occupation-list"></div><p id="atlas-total" class="fine-print"></p></div>
-          </details>
-          <button class="button subtle full next-step" type="button" data-goto="dossier">Prepare sourcing plan <span aria-hidden="true">→</span></button>
-        </div>
+    <section id="results" hidden aria-label="Generated sourcing strategy">
+      <div class="results-header"><div><p class="eyebrow">STRATEGY READY <span class="ready-dot" aria-hidden="true"></span></p><h2 id="results-title">Sourcing plan</h2><p id="results-subtitle" class="result-subtitle">Review the terms and copy your search.</p></div><button type="button" id="edit-role" class="edit-link">↖ Edit input</button></div>
+      <div id="result-updated" class="quick-note warning" hidden>Input changed. Select <strong>Generate sourcing plan</strong> to refresh your strategy and exports.</div>
+      <div id="quickstart-note" class="quick-note" hidden></div>
+      <div class="results-grid">
+        <section class="query-card" aria-labelledby="query-title">
+          <div class="query-card-top"><div><span class="step light">02 / YOUR SEARCH</span><h3 id="query-title">Ready to find the right search.</h3></div><span class="query-glyph" aria-hidden="true">⌕</span></div>
+          <p class="query-intro">Choose a starting strategy. Edit it to suit your sourcing channel.</p>
+          <div id="strategy-picks" class="strategy-picks" role="group" aria-label="Search strategy"></div>
+          <div class="query-editor-head"><label for="query-input">Boolean search</label><button type="button" id="reset-query" class="dark-quiet">Reset</button></div>
+          <textarea id="query-input" rows="5" spellcheck="false" aria-describedby="query-validation"></textarea>
+          <div class="query-card-bottom"><span id="query-validation" class="query-feedback" role="status">Checking expression…</span><button type="button" id="copy-query" class="button light-primary">Copy search ↗</button></div>
+          <p id="strategy-description" class="query-hint"></p>
+        </section>
+
+        <aside class="ingredients card" aria-labelledby="ingredients-title">
+          <div class="ingredients-head"><div><span class="step">SEARCH INGREDIENTS</span><h3 id="ingredients-title">Your key terms</h3></div><span id="match-count" class="counter">0</span></div>
+          <p class="ingredients-desc">Click a term to include or exclude it. Suggestions are yours to approve.</p>
+          <div id="terms-list" class="terms-list"></div>
+          <button id="show-more-skills" class="show-more" type="button" hidden>Show more terms</button>
+          <div class="add-terms"><label for="skill-input">Missing a skill?</label><div class="add-input"><input id="skill-input" type="text" maxlength="90" placeholder="Add a term, e.g. Python" autocomplete="off"/><button id="add-skill" type="button" aria-label="Add search term">+</button></div><div id="skill-suggestions" class="suggestions" hidden role="listbox" aria-label="Suggestions from skills library"></div><p id="add-status" class="tiny" role="status">Terms you add are labeled as recruiter-added.</p></div>
+          <details id="evidence-details" class="reveal"><summary>Where did these terms come from? <span>↘</span></summary><div id="evidence-list"></div></details>
+        </aside>
       </div>
+
+      <details id="related-details" class="advanced card"><summary><span><span class="advanced-icon">◎</span> Explore related occupations <small>Real ESCO links · optional</small></span><span class="open-indicator">↗</span></summary>
+        <div class="advanced-content"><p id="atlas-version" class="tiny">ESCO data loading…</p><p class="advanced-explain">Occupations shown here share selected, published ESCO skills. This is vocabulary research, not a list of people or potential candidates.</p><label class="field-label" for="atlas-search">Filter occupations</label><input id="atlas-search" type="search" placeholder="Search occupation names…"/><div id="graph" class="atlas-graph" aria-label="ESCO skill-to-occupation graph"></div><div id="occupation-list" class="occupation-list"></div><p id="atlas-total" class="tiny"></p><div id="taxonomy-feedback" class="taxonomy-feedback"></div></div>
+      </details>
+
+      <section class="finish card" aria-label="Export strategy"><div class="finish-text"><span class="step">03 / MAKE IT USEFUL</span><h3>Your plan is ready to take with you.</h3><p>Export a reviewed brief or an Excel workbook with search strategies, selected terms and an editable activity tracker.</p></div><div class="finish-actions"><button id="export-xlsx" type="button" class="button primary">Download Excel plan <span>↓</span></button><button id="export-md" type="button" class="button outline">Download sourcing brief <span>↓</span></button></div></section>
+      <details id="outreach-details" class="outreach card"><summary><span>✉ Outreach starter <small>Optional · editable, never sent</small></span><span>↗</span></summary><div class="outreach-content"><p>Use this as a starting point only. Personalize with verified candidate details before sending.</p><label class="sr-only" for="outreach-draft">Outreach draft</label><textarea id="outreach-draft" rows="7"></textarea><div class="row-end"><button id="copy-outreach" class="button outline" type="button">Copy draft</button></div><label for="reviewer-notes" class="field-label">Recruiter notes (optional)</label><textarea id="reviewer-notes" rows="3" placeholder="What to verify, which channels to try, follow-ups…"></textarea></div></details>
     </section>
 
-    <section class="stage" role="tabpanel" id="panel-dossier" aria-label="Export plan" hidden>
-      <div class="two-column">
-        <div class="work-panel export-panel">
-          <div class="panel-heading"><div><span class="overline">STEP 03</span><h3>Ready to hand off?</h3></div><p>Review the communication draft, add context, and export a sourcing brief.</p></div>
-          <label for="outreach-draft">Outreach starting point <span>Editable, never sent</span></label>
-          <textarea id="outreach-draft" rows="8" placeholder="Analyze a role to prepare a draft."></textarea>
-          <button type="button" id="copy-outreach" class="text-action left-action">Copy outreach draft ↗</button>
-          <label for="reviewer-notes">Recruiter notes <span>Optional</span></label>
-          <textarea id="reviewer-notes" rows="4" maxlength="3000" placeholder="Hiring manager questions, location, constraints, review notes…"></textarea>
-          <div class="button-row export-actions"><button type="button" id="export-md" class="button primary">Download brief <span aria-hidden="true">↓</span></button><button type="button" id="export-csv" class="button subtle">Excel-ready CSV</button></div>
-        </div>
-        <div class="work-panel preview-panel">
-          <div class="panel-heading"><div><span class="overline">AT A GLANCE</span><h3>Plan preview</h3></div><p>Your selection is assembled locally. No unverified metrics or applicant records.</p></div>
-          <div id="dossier-preview" class="dossier-preview"></div>
-          <div class="privacy-foot"><span aria-hidden="true">◇</span><span>Human approval required. No candidate ranking, scraping or automatic outreach.</span></div>
-        </div>
-      </div>
-    </section>
-    <div class="workspace-foot"><span><span class="pulse"></span> PRIVATE BROWSER WORKSPACE</span><span id="workspace-hint">START WITH A JOB DESCRIPTION.</span><span>V0.2 / RECRUITER CONTROLLED</span></div>
-  </section>
-
-  <section id="about" class="about container"><div><p class="eyebrow">THE DATA BEHIND IT</p><h2>Source-linked, not black-box.</h2></div><div><p>ScoutForge uses a published subset of the European Commission's ESCO occupation–skill classification to suggest terms and adjacent roles. The search comparison tests only taxonomy records, never people. Your role text stays in this browser session.</p><a href="https://esco.ec.europa.eu/en/use-esco/download" target="_blank" rel="noopener noreferrer">View ESCO data source ↗</a></div></section>
-</main>
-<footer class="footer container"><span class="footer-logo">scoutforge<span>.</span></span><span>Independent sourcing research project · Not affiliated with any employer or recruiting platform.</span><a href="https://github.com/abrar0205/ScoutForge" target="_blank" rel="noopener noreferrer">View code ↗</a></footer>
+    <footer class="footer"><span><strong>SCOUTFORGE</strong> / Independent sourcing research tool</span><span>Search terms ≠ candidate availability · <a href="https://esco.ec.europa.eu/en/use-esco/download" target="_blank" rel="noopener noreferrer">ESCO taxonomy ↗</a></span></footer>
+  </main>
+  <div id="notification" role="status" hidden></div>
 </body>
 </html>
