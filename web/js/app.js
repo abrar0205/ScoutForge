@@ -31,7 +31,7 @@ const STRATEGY_HELP = {
 
 const state = {
   role: null, langs: new Set(['en', 'de']), strategy: 'balanced', titleOff: new Set(), customTitles: [],
-  tiers: new Set(['core', 'regional']), employers: [], outreach: { lang: 'en', tone: 'concise', edited: false },
+  tiers: new Set(['core', 'regional']), employers: [], showAllTitles: false, outreach: { lang: 'en', tone: 'concise', edited: false },
   escoIndex: null, ai: { provider: 'anthropic', key: '', model: PROVIDERS.anthropic.model, base: '' }, batch: [], ats: null,
 };
 
@@ -40,10 +40,15 @@ function toast(msg) {
   const t = $('#toast'); t.textContent = msg; t.hidden = false;
   clearTimeout(toast.timer); toast.timer = setTimeout(() => { t.hidden = true; }, 2200);
 }
-async function copyText(text) {
+async function copyText(text, btn) {
   try { await navigator.clipboard.writeText(text); }
   catch { const ta = h('textarea', { class: 'visually-hidden' }); ta.value = text; document.body.append(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
-  toast('Copied');
+  if (btn) {
+    // Confirm on the button itself so the eye doesn't have to leave the field.
+    if (!btn.dataset.label) btn.dataset.label = btn.textContent;
+    btn.textContent = 'Copied'; btn.classList.add('done');
+    clearTimeout(btn.timer); btn.timer = setTimeout(() => { btn.textContent = btn.dataset.label; btn.classList.remove('done'); }, 1600);
+  } else toast('Copied');
 }
 function download(name, data, type) {
   const blob = data instanceof Blob ? data : new Blob([data], { type });
@@ -80,16 +85,24 @@ function analyze() {
   const jd = $('#jd').value;
   if (!jd.trim()) { toast('Paste a job description or a few skills first'); $('#jd').focus(); return; }
   state.role = analyzeRole(jd, { title: $('#title').value, escoIndex: state.escoIndex });
-  state.titleOff = new Set(); state.customTitles = [];
+  state.titleOff = new Set(); state.customTitles = []; state.showAllTitles = false;
   state.outreach.edited = false;
   // Polish titles only help when cross-border search is on; switch on automatically for Polish JDs.
   if (/[ąęłńśźż]/i.test(jd) && !state.langs.has('pl')) { state.langs.add('pl'); syncLangBoxes(); }
   const market = marketFor(state.role.family?.id);
   state.employers = market.employers.map((e, i) => ({ ...e, selected: i < 5 }));
   $('#results').hidden = false;
+  $('#intro').hidden = true; $('#edit-jd').setAttribute('aria-expanded', 'false');
   renderRole(); renderTerms(); updateOutputs(); renderMap(); renderOutreach(true); renderPrompts();
+  showEvidence(null);
+  selectTab('search', false);
   syncAi();
-  $('#results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  window.scrollTo({ top: 0 });
+  $('#role-title').focus({ preventScroll: true });
+}
+function showIntake() {
+  $('#intro').hidden = false; $('#edit-jd').setAttribute('aria-expanded', 'true');
+  window.scrollTo({ top: 0 }); $('#jd').focus({ preventScroll: true });
 }
 
 function syncLangBoxes() { for (const cb of $$('#langs input')) cb.checked = state.langs.has(cb.value); }
@@ -97,40 +110,74 @@ function syncLangBoxes() { for (const cb of $$('#langs input')) cb.checked = sta
 function renderRole() {
   const r = state.role;
   $('#role-title').textContent = r.title;
-  $('#role-family').textContent = r.family ? `Job family: ${r.family.id.replace(/-/g, ' ')}` : 'Job family: not recognised';
+  const fam = r.family ? r.family.id.replace(/-/g, ' ') : null;
+  $('#role-family').textContent = fam ? `Job family: ${fam.charAt(0).toUpperCase() + fam.slice(1)}` : 'Job family: not recognised';
   const must = r.skills.filter((s) => s.priority === 'must' && !s.contextOnly).length;
   const nice = r.skills.filter((s) => s.priority === 'nice').length;
-  const bits = [`${must} must-have and ${nice} nice-to-have skills found`, `${r.wordCount} words`];
-  if (r.years) bits.push(`${r.years}+ years mentioned`);
-  if (r.languages.length) bits.push('languages: ' + r.languages.map((l) => l.name + (l.nice ? ' (plus)' : '')).join(', '));
-  $('#role-meta').textContent = bits.join(' · ');
+  const bits = [`Found ${must} must-have and ${nice} nice-to-have skills in ${r.wordCount} words.`];
+  if (r.years) bits.push(`Asks for ${r.years}+ years.`);
+  if (r.languages.length) bits.push('Languages: ' + r.languages.map((l) => l.name + (l.nice ? ' (a plus)' : '')).join(', ') + '.');
+  $('#role-meta').textContent = bits.join(' ');
   $('#warnings').replaceChildren(...r.warnings.map((w) => h('div', { class: 'warn', text: w })));
 }
 
-function chip({ label, pressed, onClick, tip, lang, tag }) {
-  return h('button', { type: 'button', class: 'chip', 'aria-pressed': String(!!pressed), 'data-tip': tip || null, onclick: onClick },
-    label, lang ? h('span', { class: 'lang', text: lang }) : null, tag ? h('span', { class: 'tag', text: tag }) : null);
+const chipId = (s) => 'chip-' + slug(s.id || s.name) + '-' + (s.source === 'esco' ? 'e' : 's');
+function chip({ id, label, pressed, onClick, ev, lang, tag }) {
+  const el = h('button', { id, type: 'button', class: 'chip', 'aria-pressed': String(!!pressed), onclick: onClick, 'aria-describedby': ev ? 'evidence' : null },
+    label, lang ? h('span', { class: 'lang', text: lang.toUpperCase() }) : null, tag ? h('span', { class: 'tag', text: tag }) : null);
+  if (ev) { el.addEventListener('mouseenter', () => showEvidence(ev, el)); el.addEventListener('focus', () => showEvidence(ev, el)); }
+  return el;
+}
+
+// The evidence panel replaces hover tooltips: it works with touch and keyboard and never overflows.
+function evidenceFor(s) {
+  if (s.custom) return { name: s.name, text: 'You added this term.' };
+  if (s.evidence) return { name: s.name, sentence: s.evidence[0].sentence, match: s.evidence[0].match };
+  if (s.match) return { name: s.name, text: `ESCO concept. The text contains “${s.match}”.` };
+  return null;
+}
+function showEvidence(ev, el) {
+  const box = $('#evidence');
+  for (const c of $$('.chip.active')) c.classList.remove('active');
+  if (!ev) { box.replaceChildren(h('span', { class: 'ev-k', text: 'Where a skill came from' }), 'Point at a skill, or tab to it, to see the sentence it was found in.'); return; }
+  if (el) el.classList.add('active');
+  const head = h('span', { class: 'ev-k', text: `${ev.name}${ev.sentence ? ', found in' : ''}` });
+  if (!ev.sentence) { box.replaceChildren(head, ev.text); return; }
+  const sent = ev.sentence.length > 220 ? ev.sentence.slice(0, 217) + '…' : ev.sentence;
+  const i = sent.toLowerCase().indexOf(String(ev.match).toLowerCase());
+  const q = i < 0 ? h('q', { text: sent }) : h('q', {}, sent.slice(0, i), h('mark', { text: sent.slice(i, i + ev.match.length) }), sent.slice(i + ev.match.length));
+  box.replaceChildren(head, q);
 }
 
 function renderTerms() {
   const r = state.role;
   // Titles
   const titleChips = [];
+  let titlesOn = 0;
   for (const l of LANGS) {
     if (!state.langs.has(l)) continue;
     const list = [...state.customTitles.filter((c) => c.lang === l).map((c) => ({ term: c.term, custom: true })), ...(r.titles[l] || []).map((t) => ({ term: t }))];
     for (const t of list) {
       const key = `${l}:${t.term}`;
+      if (!state.titleOff.has(key)) titlesOn++;
       titleChips.push(chip({ label: t.term, lang: l, tag: t.custom ? 'added' : null, pressed: !state.titleOff.has(key),
-        onClick: () => { state.titleOff.has(key) ? state.titleOff.delete(key) : state.titleOff.add(key); renderTerms(); updateOutputs(); } }));
+        id: 'title-' + slug(key) + '-' + titleChips.length,
+        onClick: (e) => { const id = e.currentTarget.id; state.titleOff.has(key) ? state.titleOff.delete(key) : state.titleOff.add(key); renderTerms(); updateOutputs(); document.getElementById(id)?.focus(); } }));
     }
   }
-  $('#title-chips').replaceChildren(...(titleChips.length ? titleChips : [h('span', { class: 'chip empty', text: 'No titles yet: add one below' })]));
+  // Long title lists are the main source of clutter; show the first few and let people expand.
+  const LIMIT = 6;
+  const shown = state.showAllTitles ? titleChips : titleChips.slice(0, LIMIT);
+  $('#title-chips').replaceChildren(...(titleChips.length ? shown : [h('span', { class: 'chip empty', text: 'No titles yet. Add one below.' })]));
+  const more = $('#titles-more');
+  more.hidden = titleChips.length <= LIMIT;
+  more.textContent = state.showAllTitles ? 'Show fewer titles' : `Show all ${titleChips.length} titles`;
+  more.setAttribute('aria-expanded', String(state.showAllTitles));
 
   const skillChip = (s) => chip({
-    label: s.name, pressed: s.selected, tag: s.custom ? 'added' : s.source === 'esco' ? 'ESCO' : null,
-    tip: s.custom ? 'Added by you' : s.evidence ? `“${s.evidence[0].sentence.slice(0, 180)}” · matched “${s.evidence[0].match}”` : s.match ? `ESCO concept, matched “${s.match}”` : null,
-    onClick: () => { s.selected = !s.selected; renderTerms(); updateOutputs(); },
+    id: chipId(s), label: s.name, pressed: s.selected, tag: s.custom ? 'added' : s.source === 'esco' ? 'ESCO' : null,
+    ev: evidenceFor(s),
+    onClick: () => { s.selected = !s.selected; renderTerms(); updateOutputs(); $(`#${CSS.escape(chipId(s))}`)?.focus(); },
   });
   const must = r.skills.filter((s) => s.priority === 'must' && !s.contextOnly);
   const nice = r.skills.filter((s) => s.priority === 'nice' && !s.contextOnly);
@@ -139,9 +186,11 @@ function renderTerms() {
   $('#esco-box').hidden = !r.esco.length;
   $('#esco-count').textContent = r.esco.length ? `(${r.esco.length})` : '';
   $('#esco-chips').replaceChildren(...r.esco.map(skillChip));
+  const skillsOn = allSkills().filter((s) => s.selected && !s.contextOnly).length;
+  $('#terms-count').textContent = `${titlesOn} titles, ${skillsOn} skills in use`;
   const ctx = r.skills.filter((s) => s.contextOnly);
-  const ctxItems = [...ctx.map((s) => h('div', { class: 'c-item' }, h('strong', { text: s.name }), ` · “${s.evidence[0].sentence.slice(0, 120)}”`)),
-    ...r.languages.map((l) => h('div', { class: 'c-item' }, h('strong', { text: `${l.name}${l.nice ? ' (plus)' : ''}` }), ' · set as a Spoken languages filter in LinkedIn Recruiter, not as a keyword'))];
+  const ctxItems = [...ctx.map((s) => h('div', { class: 'c-item' }, h('strong', { text: s.name }), `: “${s.evidence[0].sentence.slice(0, 120)}”`)),
+    ...r.languages.map((l) => h('div', { class: 'c-item' }, h('strong', { text: `${l.name}${l.nice ? ' (a plus)' : ''}` }), ': use the Spoken languages filter in LinkedIn Recruiter, not a keyword.'))];
   $('#context-box').hidden = !ctxItems.length;
   $('#context-list').replaceChildren(...ctxItems);
 }
@@ -164,7 +213,13 @@ function linkedinFilters() {
   return f;
 }
 
-function autosize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight + 2, 420) + 'px'; }
+function autosize(el) {
+  if (el.offsetParent === null) return; // hidden panel: sized again when its tab opens
+  el.style.height = 'auto';
+  const full = el.scrollHeight + 2;
+  el.style.height = Math.min(full, 480) + 'px';
+  el.style.overflowY = full > 480 ? 'auto' : 'hidden';
+}
 function setOutput(id, value, platform) {
   const el = $('#' + id); el.value = value; autosize(el); showCheck(id, platform);
 }
@@ -174,7 +229,15 @@ function showCheck(id, platform) {
   if (!el.value.trim()) { p.className = 'check'; p.textContent = ''; return; }
   const v = validateBoolean(el.value, platform);
   p.className = 'check ' + (v.errors.length ? 'err' : v.warnings.length ? 'warn-t' : 'ok');
-  p.textContent = v.errors.length ? '✕ ' + v.errors.join(' ') : v.warnings.length ? '! ' + v.warnings.join(' ') : `✓ Valid syntax${platform === 'xray' ? ` · ${el.value.match(/"[^"]*"|\S+/g).filter((t) => t !== 'OR').length} terms` : ''}`;
+  p.textContent = v.errors.length ? '✕ ' + v.errors.join(' ') : v.warnings.length ? '! ' + v.warnings.join(' ') : `✓ Valid syntax${platform === 'xray' ? `, ${el.value.match(/"[^"]*"|\S+/g).filter((t) => t !== 'OR').length} terms` : ''}`;
+}
+
+function selectTab(name, scroll) {
+  for (const x of $$('.tab')) { const on = x.dataset.tab === name; x.classList.toggle('active', on); x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; }
+  for (const p of $$('.panel')) p.hidden = p.dataset.panel !== name;
+  for (const ta of $$(`.panel[data-panel="${name}"] textarea.code`)) autosize(ta);
+  // On narrow screens the tabs can be far down the page; keep them in view after switching.
+  if (scroll && window.innerWidth <= 1080) $('.work').scrollIntoView({ block: 'start' });
 }
 
 function updateOutputs() {
@@ -184,10 +247,10 @@ function updateOutputs() {
   setOutput('out-li-title', pack.recruiter.title, 'recruiter');
   setOutput('out-li-kw', pack.recruiter.keywords, 'recruiter');
   setOutput('out-xray', pack.xray.query, 'xray');
-  if (pack.xray.trimmed.length) $('.check[data-for="out-xray"]').textContent += ` · trimmed to fit Google: ${pack.xray.trimmed.slice(0, 4).join(', ')}`;
+  if (pack.xray.trimmed.length) $('.check[data-for="out-xray"]').textContent += `. Left out to stay within Google's word limit: ${pack.xray.trimmed.slice(0, 4).join(', ')}`;
   $('#xray-open').href = googleUrl(pack.xray.query);
   setOutput('out-generic', pack.generic, 'recruiter');
-  $('#li-filters').replaceChildren(h('span', { class: 'hint', text: 'Set as filters:' }), ...linkedinFilters().map(([k, v]) => h('span', { class: 'filter' }, h('b', { text: k + ': ' }), v)));
+  $('#li-filters').replaceChildren(h('span', { class: 'hint', text: 'Also set these filters:' }), ...linkedinFilters().map(([k, v]) => h('span', { class: 'filter' }, h('b', { text: k + ': ' }), v)));
   renderCompanyXray();
   if (!state.outreach.edited) renderOutreach(true);
 }
@@ -198,7 +261,7 @@ function renderMap() {
   $('#map-reviewed').textContent = MARKET_REVIEWED;
   $('#map-locations').replaceChildren(...LOCATION_TIERS.map((t) => h('div', { class: 'loc' },
     h('label', { class: 'loc-head' }, h('input', { type: 'checkbox', checked: state.tiers.has(t.id) || null, onchange: (e) => { e.target.checked ? state.tiers.add(t.id) : state.tiers.delete(t.id); if (t.id === 'cross-border' && e.target.checked && !state.langs.has('pl')) { state.langs.add('pl'); syncLangBoxes(); renderTerms(); } updateOutputs(); } }), t.label),
-    h('div', { class: 'hint', text: t.places.join(' · ') + (t.note ? ` — ${t.note}` : '') }))));
+    h('div', { class: 'hint', text: t.places.join(', ') + (t.note ? `. ${t.note}` : '') }))));
   renderEmployers();
   const schools = [...m.schools, ...(state.tiers.has('cross-border') ? POLISH_SCHOOLS : [])];
   $('#map-schools').replaceChildren(...(schools.length ? schools : ['—']).map((s) => h('li', { text: s })));
@@ -207,7 +270,7 @@ function renderMap() {
 function renderEmployers() {
   $('#map-employers').replaceChildren(...state.employers.map((e) => h('label', { class: 'emp' },
     h('input', { type: 'checkbox', checked: e.selected || null, onchange: (ev) => { e.selected = ev.target.checked; renderCompanyXray(); } }),
-    h('span', {}, h('b', { text: e.name }), e.where ? ` · ${e.where}` : '', e.why ? h('span', { class: 'hint', text: ` — ${e.why}` }) : null))));
+    h('span', {}, h('b', { text: e.name }), e.where ? `, ${e.where}` : '', e.why ? h('span', { class: 'hint', text: e.why.charAt(0).toUpperCase() + e.why.slice(1) }) : null))));
 }
 function renderCompanyXray() {
   if (!state.role) return;
@@ -227,6 +290,7 @@ function renderOutreach(regenerate) {
   }
   const res = checkOutreach({ subject: $('#msg-subject').value, body: $('#msg-body').value, lang: state.outreach.lang });
   $('#msg-score').textContent = res.score;
+  $('#msg-score-box').className = 'score ' + (res.score >= 85 ? 'good' : res.score >= 60 ? 'mid' : 'low');
   $('#msg-checks').replaceChildren(...res.checks.map((c) => h('li', { class: c.pass ? 'pass' : 'fail' },
     h('span', { class: 'i', text: c.pass ? '✓' : '✕' }), h('span', {}, c.label, h('span', { class: 'd', text: c.detail })))));
 }
@@ -237,7 +301,7 @@ function renderPrompts() {
   $('#prompt-list').replaceChildren(...items.map((p) => h('details', { class: 'prompt' },
     h('summary', {}, p.title, h('span', { class: 'hint', text: p.when })),
     h('pre', { text: p.prompt }),
-    h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn small', onclick: () => copyText(p.prompt) }, 'Copy prompt')))));
+    h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn small', onclick: (e) => copyText(p.prompt, e.currentTarget) }, 'Copy prompt')))));
 }
 function aiReady() {
   const a = state.ai;
@@ -251,6 +315,7 @@ function syncAi() {
   $('#ai-base').placeholder = PROVIDERS[state.ai.provider].base;
   const ready = aiReady() && !!state.role;
   $('#ai-suggest').disabled = !ready; $('#msg-ai').disabled = !ready;
+  $('#msg-ai').title = ready ? '' : 'Add an API key under AI prompts to use this';
 }
 async function runSuggest() {
   const status = $('#ai-status'); status.textContent = 'Asking the model…'; $('#ai-suggest').disabled = true;
@@ -329,12 +394,13 @@ function runBatch() {
   if (!parts.length) { toast('Paste at least one job description'); return; }
   const langs = $$('#batch-langs input:checked').map((i) => i.value);
   state.batch = parts.map((jd) => packEntry(analyzeRole(jd, { escoIndex: state.escoIndex }), langs.length ? langs : ['en']));
-  const copyBtn = (text) => h('button', { type: 'button', class: 'btn small cp', onclick: () => copyText(text) }, 'Copy');
+  const copyBtn = (text) => h('button', { type: 'button', class: 'btn small cp', onclick: (e) => copyText(text, e.currentTarget) }, 'Copy');
   $('#batch-table tbody').replaceChildren(...state.batch.map((e) => h('tr', {},
-    h('td', {}, h('strong', { text: e.title }), h('div', { class: 'hint', text: e.role.family ? e.role.family.id.replace(/-/g, ' ') : 'family not recognised' })),
+    h('td', {}, h('strong', { text: e.title }), h('div', { class: 'hint', text: e.role.family ? e.role.family.id.replace(/-/g, ' ') : 'job family not recognised' })),
     h('td', { text: e.mustHaves.slice(0, 6).join(', ') || '—' }),
     h('td', { class: 'mono' }, e.packs.balanced.recruiter.keywords || '—', h('div', {}, copyBtn(e.packs.balanced.recruiter.keywords))),
     h('td', { class: 'mono' }, e.packs.balanced.xray.query, h('div', {}, copyBtn(e.packs.balanced.xray.query))))));
+  $('#batch-summary').textContent = `${state.batch.length} ${state.batch.length === 1 ? 'role' : 'roles'} ready. Balanced searches are shown; the workbook also has Narrow and Broad.`;
   $('#batch-results').hidden = false;
 }
 
@@ -377,9 +443,9 @@ async function renderMethod() {
 // ------------------------------------------------------------------ wiring
 function wire() {
   $('#intake').addEventListener('submit', (e) => { e.preventDefault(); analyze(); });
-  $('#jd').addEventListener('input', () => { $('#jd-count').textContent = `${($('#jd').value.match(/\S+/g) || []).length} words`; });
+  $('#jd').addEventListener('input', () => { { const n = ($('#jd').value.match(/\S+/g) || []).length; $('#jd-count').textContent = `${n} ${n === 1 ? 'word' : 'words'}`; } });
   $('#jd').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) analyze(); });
-  $('#clear').addEventListener('click', () => { $('#jd').value = ''; $('#title').value = ''; $('#results').hidden = true; state.role = null; $('#jd').dispatchEvent(new Event('input')); $('#jd').focus(); });
+  $('#clear').addEventListener('click', () => { $('#jd').value = ''; $('#title').value = ''; $('#results').hidden = true; state.role = null; $('#intro').hidden = false; $('#jd').dispatchEvent(new Event('input')); $('#jd').focus(); });
   for (const b of $$('[data-example]')) b.addEventListener('click', () => { $('#jd').value = EXAMPLES[b.dataset.example]; $('#title').value = ''; $('#jd').dispatchEvent(new Event('input')); analyze(); });
   for (const cb of $$('#langs input')) cb.addEventListener('change', () => {
     cb.checked ? state.langs.add(cb.value) : state.langs.delete(cb.value);
@@ -387,18 +453,25 @@ function wire() {
     if (state.role) { renderTerms(); updateOutputs(); }
   });
   for (const r of $$('input[name=strategy]')) r.addEventListener('change', () => { state.strategy = r.value; updateOutputs(); });
-  for (const t of $$('.tab')) t.addEventListener('click', () => {
-    for (const x of $$('.tab')) { x.classList.toggle('active', x === t); x.setAttribute('aria-selected', String(x === t)); }
-    for (const p of $$('.panel')) p.hidden = p.dataset.panel !== t.dataset.tab;
-    for (const ta of $$(`.panel[data-panel="${t.dataset.tab}"] textarea.code`)) autosize(ta);
-  });
+  const tabs = $$('.tab');
+  for (const t of tabs) {
+    t.addEventListener('click', () => selectTab(t.dataset.tab, true));
+    t.addEventListener('keydown', (e) => {
+      const i = tabs.indexOf(t);
+      const j = e.key === 'ArrowRight' ? (i + 1) % tabs.length : e.key === 'ArrowLeft' ? (i - 1 + tabs.length) % tabs.length : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : -1;
+      if (j < 0) return;
+      e.preventDefault(); selectTab(tabs[j].dataset.tab, true); tabs[j].focus();
+    });
+  }
   for (const id of ['out-li-title', 'out-li-kw', 'out-generic']) $('#' + id).addEventListener('input', () => { autosize($('#' + id)); showCheck(id, 'recruiter'); });
   for (const id of ['out-xray', 'out-company-xray']) $('#' + id).addEventListener('input', () => { autosize($('#' + id)); showCheck(id, 'xray'); });
   $('#out-xray').addEventListener('input', () => { $('#xray-open').href = googleUrl($('#out-xray').value); });
   for (const b of $$('[data-copy]')) b.addEventListener('click', () => {
     const target = $('#' + b.dataset.copy);
-    copyText(b.dataset.copy === 'msg-body' ? `${$('#msg-subject').value}\n\n${target.value}` : target.value);
+    copyText(b.dataset.copy === 'msg-body' ? `${$('#msg-subject').value}\n\n${target.value}` : target.value, b);
   });
+  $('#edit-jd').addEventListener('click', () => ($('#intro').hidden ? showIntake() : (($('#intro').hidden = true), $('#edit-jd').setAttribute('aria-expanded', 'false'))));
+  $('#titles-more').addEventListener('click', () => { state.showAllTitles = !state.showAllTitles; renderTerms(); });
   const addTitle = () => { const v = $('#add-title').value.replace(/["()]/g, '').trim(); if (!v || !state.role) return; state.customTitles.push({ term: v.slice(0, 60), lang: $('#add-title-lang').value }); if (!state.langs.has($('#add-title-lang').value)) { state.langs.add($('#add-title-lang').value); syncLangBoxes(); } $('#add-title').value = ''; renderTerms(); updateOutputs(); };
   $('#add-title-btn').addEventListener('click', addTitle);
   $('#add-title').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addTitle(); } });

@@ -37,17 +37,25 @@ def run(page, base, width):
     assets = page.evaluate("() => [...document.querySelectorAll('link[rel=stylesheet], script[type=module]')].map(e => e.getAttribute('href') || e.getAttribute('src'))")
     assert any(re.match(r"^styles\.[0-9a-f]{12}\.css$", a) for a in assets), assets
     assert any(re.match(r"^js/app\.[0-9a-f]{12}\.js$", a) for a in assets), assets
-    assert page.evaluate("getComputedStyle(document.body).fontFamily").startswith("Inter"), "self-hosted font missing"
+    assert page.evaluate("getComputedStyle(document.body).fontFamily").startswith("Archivo"), "self-hosted font missing"
 
     # 1. The v0.4 failure case now produces a clean, specific search.
     page.fill("#jd", "Industrial Automation Engineer\n\nWe are hiring an automation engineer for a high-volume manufacturing plant.\nExperience with PLCs, Siemens S7 and TIA Portal is important. You will troubleshoot industrial automation systems.\nKnowledge of Python and SQL would be useful.")
     page.click("#analyze")
+    # The intake folds away so the results lead; the role title is visible below the sticky bar.
+    expect(page.locator("#intro")).to_be_hidden()
+    expect(page.locator("#role-title")).to_be_in_viewport()
     kw = page.locator("#out-li-kw")
     expect(kw).to_have_value(re.compile(r"PLC OR SPS"))
     for junk in ["bridge", "textile", "fisheries", "ropes"]:
         assert junk not in kw.input_value().lower(), kw.input_value()
     expect(page.locator('.check[data-for="out-li-kw"]')).to_have_class(re.compile("ok"))
     assert "Automatisierungstechniker" in page.locator("#out-li-title").input_value()
+
+    # Evidence panel shows the source sentence with the matched phrase marked (keyboard focus works on touch too).
+    page.locator("#must-chips .chip", has_text="TIA Portal").focus()
+    expect(page.locator("#evidence mark")).to_have_text(re.compile("TIA Portal", re.I))
+    expect(page.locator("#evidence q")).to_contain_text("Siemens S7")
 
     # 2. Toggling a skill and the strategy changes the string.
     before = kw.input_value()
@@ -63,7 +71,20 @@ def run(page, base, width):
     expect(page.locator('.check[data-for="out-li-kw"]')).to_contain_text("not closed")
 
     # 3. Example role, talent map and company X-ray.
+    page.click("#edit-jd")
+    expect(page.locator("#jd")).to_be_visible()
     page.click('[data-example="maintenance"]')
+    # Long title lists are collapsed until asked for.
+    more = page.locator("#titles-more")
+    expect(more).to_be_visible()
+    shown = page.locator("#title-chips .chip").count()
+    more.click()
+    assert page.locator("#title-chips .chip").count() > shown
+    # Tabs follow the ARIA keyboard pattern.
+    page.locator("#tab-search").focus()
+    page.keyboard.press("ArrowRight")
+    expect(page.locator("#tab-map")).to_have_attribute("aria-selected", "true")
+    expect(page.locator("#panel-map")).to_be_visible()
     page.click('.tab[data-tab="map"]')
     cx = page.locator("#out-company-xray")
     expect(cx).to_have_value(re.compile(r"^site:linkedin\.com/in .*Rolls-Royce"))
@@ -85,8 +106,7 @@ def run(page, base, width):
     assert page.locator("#prompt-list .prompt").count() == 6
     expect(page.locator("#ai-suggest")).to_be_disabled()
 
-    # 6. Exports: workbook with formulas, brief and prompt library.
-    page.click('.tab[data-tab="export"]')
+    # 6. Exports from the role header: workbook with formulas, brief and prompt library.
     with page.expect_download() as d:
         page.click("#dl-xlsx")
     xlsx = OUT / f"workbook-{width}.xlsx"; d.value.save_as(xlsx)
@@ -101,6 +121,9 @@ def run(page, base, width):
         page.click("#dl-brief")
     brief = OUT / f"brief-{width}.md"; d.value.save_as(brief)
     assert brief.read_text().startswith("# Sourcing brief:")
+    with page.expect_download() as d:
+        page.click("#dl-prompts")
+    assert d.value.suggested_filename.startswith("prompt-library-")
 
     # 7. Batch.
     page.goto(base + "/#batch")

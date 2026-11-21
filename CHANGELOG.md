@@ -1,5 +1,22 @@
 # ScoutForge release notes
 
+## v1.1 — Clearer interface
+
+A redesign of the interface only; the engine, outputs and benchmark are unchanged.
+
+**Flow**
+- The job-description form folds away after you build a pack, so the results lead. "Edit job description" brings it back. The role title no longer hides under the top bar.
+- The downloads (Excel workbook, brief) are now in the role header instead of a separate Export tab. The result tabs are Searches, Where to look, First message and AI prompts, and they work with the arrow keys.
+- Long title lists show the first six with "Show all"; the language switch sits next to the titles it controls.
+- Terms in the search are clearly marked (tick, yellow) against terms left out (plus sign, outline).
+- An evidence panel replaces hover tooltips: point at or tab to a skill to see the sentence it came from, with the matched words highlighted. It works on touch screens and never overflows.
+- Copy buttons confirm on the button itself. The outreach score is coloured by quality. The bring-your-own-key AI settings are folded away until needed.
+- On phones: no cut-off navigation or tabs, a "Skip to the searches" link, and tabs that keep the results in view.
+
+**Look**
+- New palette taken from the factory floor (machine grey, anthracite, signal yellow) and Archivo, a variable typeface whose narrower widths are used for headings and for tight spaces on phones. Fonts remain self-hosted.
+- Plainer, shorter copy throughout.
+
 ## v1.0 — Sourcing copilot
 
 A rebuild focused on search quality, regional sourcing and measurable results.

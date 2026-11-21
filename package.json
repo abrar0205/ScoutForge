@@ -1,6 +1,6 @@
 {
   "name": "scoutforge",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "description": "Sourcing copilot for manufacturing hiring: evidence-based Boolean search packs (EN/DE/PL), talent map, outreach checks, prompt library, ATS data checks and an Excel funnel workbook. Runs in the browser.",

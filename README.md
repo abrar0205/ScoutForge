@@ -79,5 +79,5 @@ The browser test runs every flow at 1440 px and 390 px: analysis, toggles, valid
 ## Data sources and licences
 
 - ESCO v1.2.0, © European Union, used under the ESCO reuse conditions for optional multi-word skill matches. https://esco.ec.europa.eu/en/use-esco/download
-- Inter and JetBrains Mono fonts under the SIL Open Font License ([`web/assets/fonts/OFL.txt`](web/assets/fonts/OFL.txt)).
+- Archivo and JetBrains Mono fonts under the SIL Open Font License ([`web/assets/fonts/OFL.txt`](web/assets/fonts/OFL.txt)).
 - Code: MIT licence. Third-party names and trademarks belong to their owners.
