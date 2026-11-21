@@ -1,5 +1,14 @@
 # ScoutForge release notes
 
+## v0.3.1 — Prevent stale CSS and JS across deployments
+
+- Fixed a live-site mixed-release regression reported by a user: the updated page structure rendered with outdated dark/mint CSS, resulting in overlapping controls, unstyled inputs, and a skills library stuck in a loading state.
+- Pages now publishes content-fingerprinted CSS, app, and ESM dependencies as an atomic release; the page references only the matching versions.
+- Added source/package and browser regression tests that validate the deployed stylesheet, compiled module paths, rendering, and sourcing workflow.
+- Corrected the description textarea placeholder so it no longer displays literal backslash-n sequences.
+- Kept the same site URL, client-side privacy model, and verified ESCO data. No paid hosting or external JS dependencies.
+
+
 ## v0.3 — Search that actually works for humans
 
 - Fixed the reported case where entering only `python` produced zero suggestions and an unusable path through the workbench. Exact mention of Python (with job title present or absent) is accepted as a reviewable JD keyword.

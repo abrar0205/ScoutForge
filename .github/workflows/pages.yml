@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'web/**'
+      - 'scripts/build_site.py'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 permissions:
@@ -21,9 +22,12 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Verify real ESCO dataset is included
         run: |
-          python3 - <<'PY'
+          python3 - <<'PYI'
           import json
           from pathlib import Path
           p=Path('web/data/esco.json')
@@ -33,12 +37,12 @@ jobs:
           assert d['counts']['occupations']>=100
           assert d['counts']['relations']>=100
           print('Verified source:',d['version'],d['counts'])
-          PY
+          PYI
+      - name: Prepare versioned HTML/CSS/JavaScript release
+        run: python scripts/build_site.py
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: web
+          path: _site
       - uses: actions/deploy-pages@v4
         id: deployment

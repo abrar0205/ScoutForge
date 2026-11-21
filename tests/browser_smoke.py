@@ -9,7 +9,7 @@ from playwright.sync_api import sync_playwright
 from zipfile import ZipFile
 from xml.etree import ElementTree as ET
 import json, os, re
-ROOT=Path(__file__).resolve().parent.parent/'web'
+ROOT=Path(os.environ['SCOUTFORGE_SITE_ROOT']).resolve() if os.environ.get('SCOUTFORGE_SITE_ROOT') else Path(__file__).resolve().parent.parent/'web'
 FIXTURE={'source':'European Commission ESCO','version':'TEST FIXTURE','retrieved_at':'2026-01-01T00:00:00Z','counts':{'occupations':3,'skills':3,'relations':4},'skills':[{'id':'s1','name':'quality control','alt':''},{'id':'s2','name':'maintain electrical equipment','alt':''},{'id':'s3','name':'program industrial robots','alt':''}],'occupations':[{'id':'o1','name':'industrial automation technician','isco':'3113','skills':[{'id':'s2','type':'essential'},{'id':'s3','type':'optional'}]},{'id':'o2','name':'industrial engineer','isco':'2141','skills':[{'id':'s1','type':'essential'}]},{'id':'o3','name':'industrial robotics engineer','isco':'2142','skills':[{'id':'s3','type':'essential'}]}]}
 class QuietHandler(SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
@@ -39,6 +39,14 @@ try:
      html=re.sub(r'<link[^>]*fonts.gstatic[^>]*>', '',html)
      page.set_content(html,wait_until='domcontentloaded',timeout=20000)
     page.wait_for_function("document.querySelector('#data-status').textContent.includes('ready')",timeout=25000)
+    # Releases must load their own CSS and JS rather than older browser-cached copies.
+    if os.environ.get('SCOUTFORGE_SITE_ROOT'):
+     background=page.locator('body').evaluate('(el) => getComputedStyle(el).backgroundColor')
+     assert background=='rgb(246, 247, 250)',f'Wrong or stale stylesheet at {width}: {background}'
+     assert page.locator('#job-description').evaluate('(el) => getComputedStyle(el).width')!='auto'
+     assets=page.evaluate("() => [...document.querySelectorAll('link[rel=stylesheet], script[type=module]')].map(e=>e.getAttribute('href')||e.getAttribute('src'))")
+     assert any(re.match(r'^styles\.[0-9a-f]{12}\.css$',a) for a in assets),assets
+     assert any(re.match(r'^app\.[0-9a-f]{12}\.js$',a) for a in assets),assets
     # Exact screenshot repro: title supplied, description only 'python' - must NOT be empty.
     page.locator('#job-description').fill('python')
     page.locator('.optional-input summary').click()
