@@ -6,6 +6,10 @@
 
 ScoutForge turns a job description — or even a single skill — into an **editable Boolean sourcing strategy**, with inspectable search terms, optional ESCO vocabulary exploration, a recruiter-reviewed outreach draft, and an Excel workbook export.
 
+## v0.3.1 — Reliable, cache-safe website releases
+
+GitHub Pages publishes the output of `python scripts/build_site.py` (directory `_site/`), not raw `web/` files. The build fingerprints the CSS, app and imported JavaScript filenames, rewrites every reference to the same release, and writes an asset manifest. This prevents a new interface loading outdated browser-cached styles or ESM modules. The CSS and ESM paths are checked in CI and the generated site is exercised in the desktop/mobile browser tests. No browser settings or private keys are required.
+
 ## v0.3 — One input, one search, one export
 
 The v0.3 release is a product usability overhaul driven by real browser feedback. A sample failure (`Industrial Automation Engineer` and a JD containing only `python`) no longer produces an unhelpful blank analysis.
